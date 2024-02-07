@@ -1,0 +1,42 @@
+{
+    "name": "javaabu/permissions",
+    "description": "Modifications brought upon spatie/laravel-permissions",
+    "homepage": "https://github.com/Javaabu/permissions",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Athfan Khaleel",
+            "email": "athfan@javaabu.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^9.0 || ^10.0 || ^11.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^7.0 || ^8.0 || ^9.0",
+        "phpunit/phpunit": "^9.5 || ^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Javaabu\\Permissions\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Javaabu\\Permissions\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Javaabu\\Permissions\\PermissionsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
