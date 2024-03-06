@@ -4,6 +4,7 @@ namespace Javaabu\Permissions\Models;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Javaabu\Activitylog\Traits\LogsActivity;
 use Javaabu\Helpers\AdminModel\AdminModel;
 use Javaabu\Helpers\AdminModel\IsAdminModel;
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
@@ -14,23 +15,21 @@ class Role extends BaseRole implements AdminModel
 {
     use HasFactory;
     use IsAdminModel;
-
-    // TODO: Add LogsActivity trait from javaabu/activitylog package
-//    use LogsActivity;
+    use LogsActivity;
 
     /**
      * The attributes that would be logged
      *
      * @var array
      */
-//    protected static $logAttributes = ['*'];
+    protected static array $logAttributes = ['*'];
 
     /**
      * Log only changed attributes
      *
      * @var boolean
      */
-//    protected static $logOnlyDirty = true;
+    protected static bool $logOnlyDirty = true;
 
     /**
      * Create a new factory instance for the role model.
@@ -42,14 +41,7 @@ class Role extends BaseRole implements AdminModel
         return \Database\Factories\RoleFactory::new();
     }
 
-    /**
-     * A search scope
-     *
-     * @param $query
-     * @param $search
-     * @return
-     */
-    public function scopeSearch($query, $search)
+    public function scopeSearch($query, $search): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('name', 'like', '%'.$search.'%')
                      ->orWhere('description', 'like', '%'.$search.'%');
@@ -60,7 +52,7 @@ class Role extends BaseRole implements AdminModel
      */
     public function getAdminUrlAttribute(): string
     {
-        return action([RolesController::class, 'show'], $this);
+        return route('admin.roles.show', $this);
     }
 
     /**
@@ -92,10 +84,4 @@ class Role extends BaseRole implements AdminModel
             $user
         ));
     }
-
-    /*public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(static::$logAttributes);
-    }*/
 }
