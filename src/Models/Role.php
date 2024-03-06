@@ -25,11 +25,12 @@ class Role extends BaseRole implements AdminModel
     protected static array $logAttributes = ['*'];
 
     /**
-     * Log only changed attributes
-     *
-     * @var boolean
+     * Searchable fields
      */
-    protected static bool $logOnlyDirty = true;
+    protected array $searchable = [
+        'name',
+        'description',
+    ];
 
     /**
      * Create a new factory instance for the role model.
@@ -39,12 +40,6 @@ class Role extends BaseRole implements AdminModel
     protected static function newFactory(): Factory
     {
         return \Database\Factories\RoleFactory::new();
-    }
-
-    public function scopeSearch($query, $search): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('name', 'like', '%'.$search.'%')
-                     ->orWhere('description', 'like', '%'.$search.'%');
     }
 
     /**

@@ -13,12 +13,30 @@ class PermissionsServiceProvider extends ServiceProvider
     {
         // declare publishes
         if ($this->app->runningInConsole()) {
+            $this->registerMigrations();
+
             $this->publishes([
-                __DIR__ . '/../config/config.php' => config_path('permissions.php'),
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'permissions-migrations');
+
+            $this->publishes([
+                __DIR__ . '/../config/permission.php' => config_path('permission.php'),
             ], 'permissions-config');
         }
 
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+    }
+
+    /**
+     * Register migration files.
+     *
+     * @return void
+     */
+    protected function registerMigrations()
+    {
+        if (Permissions::$runsMigrations) {
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        }
     }
 
     /**
@@ -27,6 +45,6 @@ class PermissionsServiceProvider extends ServiceProvider
     public function register(): void
     {
         // merge package config with user defined config
-        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'permissions');
+        $this->mergeConfigFrom(__DIR__ . '/../config/permission.php', 'permission');
     }
 }
