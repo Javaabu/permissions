@@ -3,7 +3,7 @@
 namespace Javaabu\Permissions\Tests\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Permission\Traits\HasRoles;
+use Javaabu\Permissions\Traits\HasRoles;
 
 class User extends Authenticatable
 {
