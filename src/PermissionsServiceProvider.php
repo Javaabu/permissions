@@ -2,6 +2,7 @@
 
 namespace Javaabu\Permissions;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class PermissionsServiceProvider extends ServiceProvider
@@ -25,6 +26,17 @@ class PermissionsServiceProvider extends ServiceProvider
         }
 
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        /**
+         * Returns true if the user has any of the permissions
+         */
+        Blade::if('anypermission', function ($permissions) {
+            if ($user = auth()->user()) {
+                return $user->anyPermission($permissions);
+            }
+
+            return false;
+        });
     }
 
     /**

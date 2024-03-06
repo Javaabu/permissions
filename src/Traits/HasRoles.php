@@ -11,6 +11,26 @@ trait HasRoles
     use \Spatie\Permission\Traits\HasRoles;
 
     /**
+     * Check if the user has any of the following permissions
+     *
+     * @param  array|string  $permissions
+     */
+    public function anyPermission($permissions): bool
+    {
+        if (! is_array($permissions)) {
+            $permissions = [$permissions];
+        }
+
+        foreach ($permissions as $permission) {
+            if ($this->can($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Update the role
      *
      * @param $role
