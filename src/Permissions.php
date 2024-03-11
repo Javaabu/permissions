@@ -2,7 +2,7 @@
 
 namespace Javaabu\Permissions;
 
-abstract class Permissions
+class Permissions
 {
     /**
      * Indicates if migrations will be run.
