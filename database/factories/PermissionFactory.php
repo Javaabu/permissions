@@ -12,13 +12,13 @@ class PermissionFactory extends Factory
 
     public function definition(): array
     {
-        $prefix = $this->faker->randomElement(['edit', 'delete', 'approve', 'publish']);
-        $suffix = $this->faker->word;
+        $prefix = fake()->randomElement(['edit', 'delete', 'approve', 'publish']);
+        $suffix = fake()->unique()->word;
 
         return [
             'model' => $suffix,
-            'name' => Str::slug("$prefix $suffix", '_'),
-            'description' => $this->faker->sentence,
+            'name' =>  Str::slug("$prefix $suffix", '_'),
+            'description' => fake()->sentence,
         ];
     }
 }

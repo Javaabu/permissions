@@ -13,8 +13,8 @@ class RoleFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'        => Str::slug($this->faker->word, '_'),
-            'description' => $this->faker->sentence,
+            'name'        => Str::slug(fake()->unique()->word(), '_'),
+            'description' => fake()->sentence,
         ];
     }
 }
