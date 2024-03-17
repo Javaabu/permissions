@@ -25,8 +25,6 @@ class PermissionsServiceProvider extends ServiceProvider
             ], 'permissions-config');
         }
 
-        $this->registerMigrations();
-
         /**
          * Returns true if the user has any of the permissions
          */
