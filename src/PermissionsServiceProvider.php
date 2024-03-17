@@ -25,7 +25,7 @@ class PermissionsServiceProvider extends ServiceProvider
             ], 'permissions-config');
         }
 
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->registerMigrations();
 
         /**
          * Returns true if the user has any of the permissions
