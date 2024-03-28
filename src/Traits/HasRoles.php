@@ -51,6 +51,19 @@ trait HasRoles
             $old_role = $this->roles()->pluck('name')->all();
             $new_role = $user->can('updateRole', self::class) ? $role : [get_setting('default_role')];
 
+            // remove fake roles
+            if ($new_role) {
+                $correct_role_names = Role::whereIn('name', $new_role)->pluck('name')->all();
+                $correct_roles = array_intersect($new_role, $correct_role_names);
+
+                // no correct rules
+                if (! $correct_roles) {
+                    return;
+                }
+
+                $new_role = $correct_roles;
+            }
+
             $this->syncRoles($new_role);
 
             $same_roles = count($old_role) == count($new_role) && ! array_diff($old_role, $new_role);

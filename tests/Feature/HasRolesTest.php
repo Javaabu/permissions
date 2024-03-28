@@ -24,6 +24,24 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
+    public function it_skips_fake_roles_when_setting_user_roles(): void
+    {
+        Gate::policy(User::class, UserPolicy::class);
+
+        $user = new User(['name' => 'John', 'email' => 'test@example.com']);
+        $user->save();
+
+        $this->actingAs($user);
+
+        $user->updateRole('fake');
+
+        $this->assertDatabaseMissing('model_has_roles', [
+            'model_type' => User::class,
+            'model_id' => $user->id,
+        ]);
+    }
+
+    /** @test */
     public function it_can_assign_a_single_role(): void
     {
         Gate::policy(User::class, UserPolicy::class);
