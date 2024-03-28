@@ -3,6 +3,7 @@
 namespace Javaabu\Permissions\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Javaabu\Permissions\Events\UserRoleUpdated;
 use Javaabu\Permissions\Models\Role;
 
@@ -43,25 +44,19 @@ trait HasRoles
             return;
         }
 
+        $role = Arr::wrap($role);
+
         // update role only if it's a new user or the user can update the role
         if ($user->can('updateRole', self::class) || $new) {
-            $old_role = $this->role ? $this->role->name : null;
-            $new_role = $user->can('updateRole', self::class) ? $role : get_setting('default_role');
+            $old_role = $this->roles()->pluck('name')->all();
+            $new_role = $user->can('updateRole', self::class) ? $role : [get_setting('default_role')];
 
-            // validate role
-            if ($new_role && ! Role::whereName($new_role)->exists()) {
-                return;
-            }
+            $this->syncRoles($new_role);
 
-            $roles = $new_role ?: [];
-            if (! is_array($roles)) {
-                $roles = [$roles];
-            }
-
-            $this->syncRoles($roles);
+            $same_roles = count($old_role) == count($new_role) && ! array_diff($old_role, $new_role);
 
             // log the role update
-            if ($old_role != $new_role) {
+            if (! $same_roles) {
                 event(new UserRoleUpdated($old_role, $new_role, $this, $user));
             }
         }

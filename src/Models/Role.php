@@ -66,17 +66,21 @@ class Role extends BaseRole implements AdminModel
      */
     public function syncPermissionIds(array $permissions): void
     {
-        $old_permissions = $this->permissions()->pluck('name');
-        $new_permissions = Permission::whereIn('id', $permissions)->pluck('name');
+        $old_permissions = $this->permissions()->pluck('name')->all();
+        $new_permissions = Permission::whereIn('id', $permissions)->pluck('name')->all();
 
         $this->permissions()->sync($permissions);
 
-        $user = auth()->user();
-        event(new RolePermissionsUpdated(
-            $old_permissions->all(),
-            $new_permissions->all(),
-            $this,
-            $user
-        ));
+        $same_permissions = count($old_permissions) == count($new_permissions) && ! array_diff($old_permissions, $new_permissions);
+
+        if (! $same_permissions) {
+            $user = auth()->user();
+            event(new RolePermissionsUpdated(
+                $old_permissions,
+                $new_permissions,
+                $this,
+                $user
+            ));
+        }
     }
 }

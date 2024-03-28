@@ -48,4 +48,6 @@ class PermissionsTest extends TestCase
 
         $this->assertTrue($user->can('test'));
     }
+
+
 }
