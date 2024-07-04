@@ -10,6 +10,10 @@ use Javaabu\Permissions\Listeners\LogUserRoleUpdate;
 
 class EventServiceProvider extends ServiceProvider
 {
+    protected function configureEmailVerification(){
+        // fix for Registered Event listener getting registered multiple times
+        // see https://github.com/laravel/framework/issues/50783#issuecomment-2072411615
+    }
     protected $listen = [
         UserRoleUpdated::class => [
             LogUserRoleUpdate::class,
