@@ -2,7 +2,6 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/javaabu/permissions.svg?style=flat-square)](https://packagist.org/packages/javaabu/permissions)
 [![Test Status](../../actions/workflows/run-tests.yml/badge.svg?branch=v1)](../../actions/workflows/run-tests.yml)
-[![Quality Score](https://img.shields.io/scrutinizer/g/javaabu/permissions.svg?style=flat-square)](https://scrutinizer-ci.com/g/javaabu/permissions)
 [![Total Downloads](https://img.shields.io/packagist/dt/javaabu/permissions.svg?style=flat-square)](https://packagist.org/packages/javaabu/permissions)
 
 Modifications brought upon spatie/laravel-permissions
