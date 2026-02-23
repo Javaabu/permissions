@@ -3,16 +3,14 @@
 namespace Javaabu\Permissions\Tests\Feature;
 
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Gate;
 use Javaabu\Activitylog\Models\Activity;
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
-use Javaabu\Permissions\Events\UserRoleUpdated;
 use Javaabu\Permissions\Models\Permission;
 use Javaabu\Permissions\Tests\InteractsWithDatabase;
 use Javaabu\Permissions\Models\Role;
 use Javaabu\Permissions\Tests\Models\User;
-use Javaabu\Permissions\Tests\Policies\UserPolicy;
 use Javaabu\Permissions\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class RolesTest extends TestCase
 {
@@ -25,7 +23,7 @@ class RolesTest extends TestCase
         $this->runMigrations();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_sync_the_role_permissions(): void
     {
         $user = new User(['name' => 'John', 'email' => 'test@example.com']);
@@ -56,7 +54,7 @@ class RolesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     function an_event_is_emitted_when_a_roles_permissions_is_updated()
     {
         Event::fake();
@@ -95,7 +93,7 @@ class RolesTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     function it_logs_the_new_and_old_permissions_when_a_role_is_updated()
     {
         $user = new User(['name' => 'John', 'email' => 'test@example.com']);

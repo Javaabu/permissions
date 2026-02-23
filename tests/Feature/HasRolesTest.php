@@ -11,6 +11,7 @@ use Javaabu\Permissions\Models\Role;
 use Javaabu\Permissions\Tests\Models\User;
 use Javaabu\Permissions\Tests\Policies\UserPolicy;
 use Javaabu\Permissions\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class HasRolesTest extends TestCase
 {
@@ -23,7 +24,7 @@ class HasRolesTest extends TestCase
         $this->runMigrations();
     }
 
-    /** @test */
+    #[Test]
     public function it_skips_fake_roles_when_setting_user_roles(): void
     {
         Gate::policy(User::class, UserPolicy::class);
@@ -41,7 +42,7 @@ class HasRolesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_assign_a_single_role(): void
     {
         Gate::policy(User::class, UserPolicy::class);
@@ -68,7 +69,7 @@ class HasRolesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_assign_multiple_roles(): void
     {
         Gate::policy(User::class, UserPolicy::class);
@@ -111,7 +112,7 @@ class HasRolesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     function an_event_is_emitted_when_the_user_role_is_updated()
     {
         Event::fake();
@@ -144,7 +145,7 @@ class HasRolesTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     function it_logs_the_new_and_old_roles_when_a_user_role_is_updated()
     {
         Gate::policy(User::class, UserPolicy::class);

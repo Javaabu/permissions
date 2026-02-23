@@ -7,6 +7,7 @@ use Javaabu\Permissions\Models\Permission;
 use Javaabu\Permissions\Models\Role;
 use Javaabu\Permissions\Tests\Models\User;
 use Javaabu\Permissions\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class PermissionsTest extends TestCase
 {
@@ -19,7 +20,7 @@ class PermissionsTest extends TestCase
         $this->runMigrations();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_a_user_has_a_permission(): void
     {
         $user = new User(['name' => 'Test User', 'email' => 'test@example.com']);
