@@ -17,7 +17,7 @@
         "javaabu/activitylog": "^1.4"
     },
     "require-dev": {
-        "orchestra/testbench": "^7.0 || ^8.0 || ^9.0 || ^10.0",
+        "orchestra/testbench": "^7.0 || ^8.0 || ^9.16 || ^10.0",
         "phpunit/phpunit": "^9.5 || ^10.5 || ^11.5.3"
     },
     "autoload": {
@@ -34,7 +34,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.0-dev"
+            "dev-main": "1.4-dev"
         },
         "laravel": {
             "providers": [
