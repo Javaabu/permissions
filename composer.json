@@ -18,7 +18,8 @@
     },
     "require-dev": {
         "orchestra/testbench": "^10.0 || ^11.0",
-        "phpunit/phpunit": "^12.5.8 || ^13.0.3"
+        "phpunit/phpunit": "^12.5.8 || ^13.0.3",
+        "javaabu/forms": "^1.71"
     },
     "autoload": {
         "psr-4": {

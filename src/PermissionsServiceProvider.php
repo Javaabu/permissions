@@ -24,7 +24,15 @@ class PermissionsServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../config/permission.php' => config_path('permission.php'),
             ], 'permissions-config');
+
+            $this->publishes([
+                __DIR__ . '/../resources/views' => resource_path('views/vendor/permissions'),
+            ], 'permissions-views');
         }
+
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'permissions');
+
+        Blade::componentNamespace('Javaabu\\Permissions\\Views\\Components', 'permissions');
 
         /**
          * Returns true if the user has any of the permissions
