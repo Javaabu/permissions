@@ -91,10 +91,19 @@ return [
     |
     | Which stack the role pages render with: `blade` (javaabu/forms) or
     | `inertia` (@javaabu/forms React pages shipped through javaabu/manifest).
+    | Requests that expect JSON always get JSON.
     |
     */
 
-    'views' => 'blade',
+    'views' => env('PERMISSIONS_VIEWS', 'blade'),
+
+    /*
+    | The Blade layout the pages extend, and the section they fill.
+    */
+
+    'layout' => 'layouts.app',
+
+    'layout_section' => 'content',
 
     /*
     |--------------------------------------------------------------------------

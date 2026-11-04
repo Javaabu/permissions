@@ -17,14 +17,31 @@
             "email": "athfan@javaabu.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Javaabu/forms"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Javaabu/manifest"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/n4ff4h/translatable"
+        }
+    ],
     "require": {
         "php": "^8.4",
         "illuminate/support": "^12.0 || ^13.0",
+        "javaabu/forms": "^2.0@dev",
+        "javaabu/manifest": "^1.0@dev",
         "spatie/laravel-permission": "^7.2"
     },
     "require-dev": {
         "inertiajs/inertia-laravel": "^2.0",
         "javaabu/boost-javaabu-guidelines": "^1.0",
+        "javaabu/translatable": "^3.0@dev",
         "laravel/pint": "^1.24",
         "orchestra/testbench": "^10.0 || ^11.0",
         "phpunit/phpunit": "^11.5.3 || ^12.5.8",
@@ -32,7 +49,8 @@
     },
     "suggest": {
         "spatie/laravel-activitylog": "Logs role and permission changes (^4.10)",
-        "inertiajs/inertia-laravel": "Renders the role pages with Inertia React when permissions.views is inertia (^2.0)"
+        "inertiajs/inertia-laravel": "Renders the role pages with Inertia React when permissions.views is inertia (^2.0)",
+        "javaabu/translatable": "Translates role descriptions (^3.0)"
     },
     "autoload": {
         "psr-4": {

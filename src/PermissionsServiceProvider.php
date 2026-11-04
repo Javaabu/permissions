@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Javaabu\Manifest\Concerns\RegistersAssets;
+use Javaabu\Manifest\Package;
 use Javaabu\Permissions\Commands\SyncPermissionsCommand;
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
 use Javaabu\Permissions\Events\UserRoleUpdated;
@@ -18,6 +20,8 @@ use Spatie\Permission\PermissionRegistrar;
 
 class PermissionsServiceProvider extends ServiceProvider
 {
+    use RegistersAssets;
+
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/permission.php', 'permission');
@@ -40,6 +44,7 @@ class PermissionsServiceProvider extends ServiceProvider
         $this->loadJsonTranslationsFrom(__DIR__ . '/../lang');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'permissions');
 
+        $this->registerFrontendAssets();
         $this->registerRouteMacros();
         $this->registerDefaultPermissions();
 
@@ -75,6 +80,28 @@ class PermissionsServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/views' => resource_path('views/vendor/permissions'),
         ], 'permissions-views');
+    }
+
+    /**
+     * The Inertia pages (permissions::Roles/Index, …), the components apps can import as
+     * `@javaabu/permissions`, and the script the Blade pages load
+     */
+    protected function registerFrontendAssets(): void
+    {
+        $this->registerAssets('permissions', __DIR__ . '/../resources', function (Package $package) {
+            $package
+                ->script('roles', 'js/roles.ts')
+                ->js()
+                ->pages()
+                ->npm([
+                    '@javaabu/forms' => 'github:Javaabu/react-forms#next-gen',
+                    '@javaabu/onu' => '^0.2.1',
+                ], peer_dependencies: [
+                    'react' => '^18.3 || ^19.0',
+                    'react-dom' => '^18.3 || ^19.0',
+                    '@inertiajs/react' => '^2.0 || ^3.0',
+                ]);
+        });
     }
 
     protected function registerRouteMacros(): void

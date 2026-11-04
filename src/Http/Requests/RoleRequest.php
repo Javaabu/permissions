@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Javaabu\Permissions\Routing\RoleRoutes;
+use Javaabu\Permissions\Support\Translations;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleRequest extends FormRequest
 {
@@ -22,36 +24,61 @@ class RoleRequest extends FormRequest
     {
         $guard = RoleRoutes::guard($this);
         $tables = config('permission.table_names');
-        $role = $this->route('role');
-        $role_id = $role instanceof Model ? $role->getKey() : $role;
+        $role = $this->role();
+        $required = $this->isMethod('post') ? 'required' : 'sometimes';
 
-        return [
+        $rules = [
             'name' => [
-                $this->isMethod('post') ? 'required' : 'sometimes',
+                $required,
                 'string',
                 'max:255',
                 'alpha_dash:ascii',
                 Rule::unique($tables['roles'], 'name')
                     ->where('guard_name', $guard)
-                    ->ignore($role_id),
+                    ->ignore($role?->getKey()),
             ],
-            'description' => [$this->isMethod('post') ? 'required' : 'sometimes', 'string', 'max:255'],
+            'description' => [$required, 'string', 'max:255'],
             'permissions' => ['sometimes', 'array'],
             'permissions.*' => [
                 'integer',
                 Rule::exists($tables['permissions'], 'id')->where('guard_name', $guard),
             ],
         ];
+
+        // description_en, description_dv, … when javaabu/translatable translates descriptions
+        return Translations::rules($role, $rules);
+    }
+
+    /**
+     * The role being updated, if any, from the route's guard
+     */
+    public function role(): ?Model
+    {
+        $role = $this->route('role');
+
+        if ($role === null || $role instanceof Model) {
+            return $role;
+        }
+
+        return app(PermissionRegistrar::class)->getRoleClass()::query()
+            ->where('guard_name', RoleRoutes::guard($this))
+            ->find($role);
     }
 
     /** @return array<string, string> */
     public function attributes(): array
     {
-        return [
+        $attributes = [
             'name' => __('name'),
             'description' => __('description'),
             'permissions' => __('permissions'),
             'permissions.*' => __('permission'),
         ];
+
+        foreach (Translations::form($this->role())['inputs']['description'] ?? [] as $input) {
+            $attributes[$input['name']] = $input['label'];
+        }
+
+        return $attributes;
     }
 }

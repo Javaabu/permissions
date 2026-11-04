@@ -58,6 +58,14 @@ class RoleRoutes
     }
 
     /**
+     * Whether the current route is one of the role routes
+     */
+    public static function isRoleRoute(Request $request): bool
+    {
+        return $request->route()?->getAction(self::GUARD_ACTION) !== null;
+    }
+
+    /**
      * The route name prefix of the current route, e.g. `admin.roles`
      */
     public static function namePrefix(Request $request): string

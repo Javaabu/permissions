@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Inertia\ServiceProvider;
 use Inertia\Testing\AssertableInertia;
+use Javaabu\Manifest\Facades\Manifest;
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
 use Javaabu\Permissions\Models\Permission;
 use Javaabu\Permissions\Models\Role;
@@ -56,8 +57,8 @@ class RolesControllerTest extends TestCase
     {
         parent::setUp();
 
-        View::prependNamespace('permissions', __DIR__ . '/../views');
         View::addLocation(__DIR__ . '/../views');
+        Manifest::fake();
 
         Permissions::resource('posts', label: 'Posts');
         Permissions::sync();
@@ -108,10 +109,9 @@ class RolesControllerTest extends TestCase
         $this->actingAs($this->admin(), 'web_admin')
             ->get('/admin/roles')
             ->assertOk()
-            ->assertViewIs('permissions::roles.index')
-            ->assertSee('<h1>Roles</h1>', false)
-            ->assertSee('web_admin|admin.roles.index')
-            ->assertSee('<li>Super Admin</li>', false);
+            ->assertSee('Roles')
+            ->assertSee('Super Admin')
+            ->assertSee(url('/admin/roles/create'), false);
     }
 
     #[Test]
@@ -170,8 +170,8 @@ class RolesControllerTest extends TestCase
         $this->actingAs($this->admin(), 'web_admin')
             ->get("/admin/roles/{$role->id}/edit")
             ->assertOk()
-            ->assertSee('<span class="granted">ޕޯސްޓްތައް ބަދަލުކުރުން</span>', false)
-            ->assertSee('<h2>ރޯލްތައް</h2>', false);
+            ->assertSee('ޕޯސްޓްތައް ބަދަލުކުރުން')
+            ->assertSee('ރޯލްތައް');
     }
 
     #[Test]
@@ -304,8 +304,8 @@ class RolesControllerTest extends TestCase
         $this->actingAs($this->admin(), 'web_admin')
             ->get("/admin/roles/{$role->id}")
             ->assertOk()
-            ->assertViewIs('permissions::roles.show')
-            ->assertViewHas('permission_groups');
+            ->assertSee('super_admin')
+            ->assertSee('View roles');
     }
 
     #[Test]

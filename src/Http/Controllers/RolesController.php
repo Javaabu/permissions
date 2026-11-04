@@ -15,6 +15,7 @@ use Javaabu\Permissions\Http\Requests\RoleRequest;
 use Javaabu\Permissions\Http\Resources\RoleResource;
 use Javaabu\Permissions\Routing\RoleRoutes;
 use Javaabu\Permissions\Support\PermissionGroups;
+use Javaabu\Permissions\Support\Translations;
 use Javaabu\Permissions\Views\ViewRenderer;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -36,7 +37,6 @@ class RolesController extends Controller
     {
         $this->authorizeAbility($request, 'viewAny', $this->roleClass());
 
-        $guard = RoleRoutes::guard($request);
         $search = $request->string('search')->trim()->toString() ?: null;
         $per_page = min(max($request->integer('per_page', 20), 1), 100);
 
@@ -52,12 +52,11 @@ class RolesController extends Controller
         }
 
         return $this->views->render('roles.index', [
-            'roles' => $this->views->stack() === ViewRenderer::INERTIA
+            ...$this->meta($request),
+            'roles' => $this->views->isInertia()
                 ? RoleResource::collection($roles)
                 : $roles,
             'search' => $search,
-            'guard' => $guard,
-            'routes' => $this->routeNames($request),
             'title' => $search
                 ? __('Roles matching \':search\'', ['search' => $search])
                 : __('Roles'),
@@ -79,11 +78,8 @@ class RolesController extends Controller
 
         /** @var Model $role */
         $role = new $role_class;
-        $role->forceFill([
-            'name' => $request->validated('name'),
-            'description' => $request->validated('description'),
-            'guard_name' => RoleRoutes::guard($request),
-        ]);
+        $role->fill($this->attributes($request));
+        $role->forceFill(['guard_name' => RoleRoutes::guard($request)]);
         $role->save();
 
         $role->syncPermissionIds($request->validated('permissions', []), $request->user());
@@ -95,7 +91,7 @@ class RolesController extends Controller
         }
 
         return redirect()
-            ->route($this->routeNames($request)['edit'], $role)
+            ->route($this->routeName($request, 'edit'), $role)
             ->with('success', __('Role created'));
     }
 
@@ -105,17 +101,18 @@ class RolesController extends Controller
 
         $this->authorizeAbility($request, 'view', $role);
 
+        $role->load('permissions');
+
         if ($request->expectsJson()) {
-            return (new RoleResource($role->load('permissions')))->response();
+            return (new RoleResource($role))->response();
         }
 
         return $this->views->render('roles.show', [
-            'role' => $this->views->stack() === ViewRenderer::INERTIA
-                ? (new RoleResource($role->load('permissions')))->resolve($request)
-                : $role->load('permissions'),
+            ...$this->meta($request, $role),
+            'role' => $this->views->isInertia()
+                ? (new RoleResource($role))->resolve($request)
+                : $role,
             'permission_groups' => $this->permission_groups->forRole($role),
-            'guard' => RoleRoutes::guard($request),
-            'routes' => $this->routeNames($request),
             'title' => $role->translated_description,
         ]);
     }
@@ -135,7 +132,7 @@ class RolesController extends Controller
 
         $this->authorizeAbility($request, 'update', $role);
 
-        $role->forceFill(Arr::only($request->validated(), ['name', 'description']));
+        $role->fill($this->attributes($request));
         $role->save();
 
         if ($request->has('permissions') || ! $request->expectsJson()) {
@@ -147,7 +144,7 @@ class RolesController extends Controller
         }
 
         return redirect()
-            ->route($this->routeNames($request)['edit'], $role)
+            ->route($this->routeName($request, 'edit'), $role)
             ->with('success', __('Role updated'));
     }
 
@@ -166,33 +163,114 @@ class RolesController extends Controller
         }
 
         return redirect()
-            ->route($this->routeNames($request)['index'])
+            ->route($this->routeName($request, 'index'))
             ->with('success', __('Role deleted'));
     }
 
+    /**
+     * The create and edit pages, or their data as JSON
+     */
     protected function form(Request $request, ?Model $role): View|Responsable|JsonResponse
     {
-        $guard = RoleRoutes::guard($request);
+        $role?->load('permissions');
 
         $data = [
-            'role' => $role ? (new RoleResource($role->load('permissions')))->resolve($request) : null,
-            'permission_groups' => $this->permission_groups->forGuard($guard, $role),
-            'guard' => $guard,
+            'role' => $role ? (new RoleResource($role))->resolve($request) : null,
+            'permission_groups' => $this->permission_groups->forGuard(RoleRoutes::guard($request), $role),
+            'guard' => RoleRoutes::guard($request),
+            'translations' => Translations::form($role),
         ];
 
         if ($request->expectsJson()) {
             return response()->json(['data' => $data]);
         }
 
-        if ($this->views->stack() !== ViewRenderer::INERTIA) {
+        if (! $this->views->isInertia()) {
             $data['role'] = $role;
         }
 
         return $this->views->render($role ? 'roles.edit' : 'roles.create', [
+            ...$this->meta($request, $role),
             ...$data,
-            'routes' => $this->routeNames($request),
             'title' => $role ? $role->translated_description : __('New role'),
         ]);
+    }
+
+    /**
+     * The role's own attributes from the request: name and description, or a description per
+     * locale when descriptions are translated
+     *
+     * @return array<string, mixed>
+     */
+    protected function attributes(RoleRequest $request): array
+    {
+        return Arr::except($request->validated(), ['permissions']);
+    }
+
+    /**
+     * What every page gets: the guard, route names, URLs, what the user may do and, for the
+     * Inertia pages, their translated text
+     *
+     * @return array<string, mixed>
+     */
+    protected function meta(Request $request, ?Model $role = null): array
+    {
+        $user = $request->user();
+
+        return [
+            'guard' => RoleRoutes::guard($request),
+            'routes' => $this->routeNames($request),
+            'urls' => array_filter([
+                'index' => route($this->routeName($request, 'index')),
+                'create' => route($this->routeName($request, 'create')),
+                'store' => route($this->routeName($request, 'store')),
+                'show' => $role ? route($this->routeName($request, 'show'), $role) : null,
+                'edit' => $role ? route($this->routeName($request, 'edit'), $role) : null,
+                'update' => $role ? route($this->routeName($request, 'update'), $role) : null,
+                'destroy' => $role ? route($this->routeName($request, 'destroy'), $role) : null,
+            ]),
+            'can' => [
+                'create' => (bool) $user?->can('create', $this->roleClass()),
+                'update' => $role ? (bool) $user?->can('update', $role) : false,
+                'delete' => $role ? (bool) $user?->can('delete', $role) : false,
+            ],
+            'strings' => $this->views->isInertia() ? $this->strings() : null,
+        ];
+    }
+
+    /**
+     * The translated text of the Inertia pages (Blade views use __() directly)
+     *
+     * @return array<string, string>
+     */
+    protected function strings(): array
+    {
+        return [
+            'roles' => __('Roles'),
+            'new_role' => __('New role'),
+            'search' => __('Search roles'),
+            'name' => __('Name'),
+            'name_help' => __('Letters, numbers, dashes and underscores, e.g. content_editor'),
+            'description' => __('Description'),
+            'permissions' => __('Permissions'),
+            'permissions_count' => __(':count permissions'),
+            'actions' => __('Actions'),
+            'view' => __('View'),
+            'edit' => __('Edit'),
+            'delete' => __('Delete'),
+            'save' => __('Save'),
+            'create' => __('Create role'),
+            'back' => __('Back to roles'),
+            'confirm_delete' => __('Delete this role? Users with it lose its permissions.'),
+            'no_roles' => __('No roles yet'),
+            'no_roles_message' => __('Roles you create will appear here.'),
+            'no_results' => __('No roles match your search.'),
+            'select_all' => __('Select all'),
+            'select_none' => __('Select none'),
+            'no_permissions' => __('This role has no permissions.'),
+            'details' => __('Details'),
+            'guard' => __('Guard'),
+        ];
     }
 
     /**
@@ -221,6 +299,11 @@ class RolesController extends Controller
         return app(PermissionRegistrar::class)->getRoleClass();
     }
 
+    protected function routeName(Request $request, string $action): string
+    {
+        return RoleRoutes::namePrefix($request) . ".{$action}";
+    }
+
     /**
      * Names of the routes, honouring the prefix the app registered them under
      *
@@ -228,10 +311,8 @@ class RolesController extends Controller
      */
     protected function routeNames(Request $request): array
     {
-        $prefix = RoleRoutes::namePrefix($request);
-
         return collect(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
-            ->mapWithKeys(fn (string $action) => [$action => "{$prefix}.{$action}"])
+            ->mapWithKeys(fn (string $action) => [$action => $this->routeName($request, $action)])
             ->all();
     }
 }

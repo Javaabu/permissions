@@ -23,7 +23,7 @@ class ViewRenderer
      */
     public function render(string $page, array $data = []): View|Responsable
     {
-        if ($this->stack() === self::INERTIA) {
+        if ($this->isInertia()) {
             return $this->renderInertia($page, $data);
         }
 
@@ -33,6 +33,11 @@ class ViewRenderer
     public function stack(): string
     {
         return config('permissions.views', self::BLADE);
+    }
+
+    public function isInertia(): bool
+    {
+        return $this->stack() === self::INERTIA;
     }
 
     /**
