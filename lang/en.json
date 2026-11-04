@@ -1,0 +1,17 @@
+{
+    "Other": "Other",
+    "Super Admin": "Super Admin",
+    "Roles": "Roles",
+    "View roles": "View roles",
+    "Edit roles": "Edit roles",
+    "Delete roles": "Delete roles",
+    "Roles matching ':search'": "Roles matching ':search'",
+    "New role": "New role",
+    "Role created": "Role created",
+    "Role updated": "Role updated",
+    "Role deleted": "Role deleted",
+    "name": "name",
+    "description": "description",
+    "permissions": "permissions",
+    "permission": "permission"
+}

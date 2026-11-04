@@ -1,7 +1,16 @@
 # Changelog
 
-All notable changes will be documented in this file
+All notable changes will be documented in this file. See [docs/upgrading.md](docs/upgrading.md) for moving from v2.
 
-## 1.0.0 - 202X-XX-XX
+## 3.0.0 - unreleased
 
-- initial release
+- Permission registration API: `Permissions::register()`, `resource()`, `role()`, grouped permissions with translatable descriptions and labels
+- `php artisan permissions:sync` (with `--guard` and `--prune`), `PermissionsSeeder` and `Permissions::sync()`
+- Overridable package policies: `Permissions::policy()`, `config('permissions.policies')`, and `Gate::policy()` in the app
+- `ResourcePolicy` base class with custom abilities, ownership and guard support; `RolePolicy`
+- Multi-auth: `permissions.guards`, per-group and per-role guards, `Permissions::guardFor()`, `Permissions::check()`, guard-aware `anyPermission()` and `@anypermission`
+- Role management: `Route::roles()`, an overridable `RolesController` with a JSON API, Blade and Inertia pages
+- Dhivehi translations
+- Activity logging is optional, through spatie/laravel-activitylog
+- Requires PHP 8.4 and Laravel 12 or 13
+- Breaking: no longer requires javaabu/helpers or javaabu/activitylog; `Role` no longer implements `AdminModel` or uses `LogsActivity`; factories moved to `Javaabu\Permissions\Database\Factories`; `updateRole()` no longer reads `get_setting()`

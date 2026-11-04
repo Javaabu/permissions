@@ -73,10 +73,6 @@ class PermissionsServiceProvider extends ServiceProvider
         ], 'permissions-spatie-config');
 
         $this->publishes([
-            __DIR__ . '/../lang' => $this->app->langPath('vendor/permissions'),
-        ], 'permissions-translations');
-
-        $this->publishes([
             __DIR__ . '/../resources/views' => resource_path('views/vendor/permissions'),
         ], 'permissions-views');
     }
