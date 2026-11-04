@@ -4,13 +4,17 @@ namespace Javaabu\Permissions;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Javaabu\Permissions\Commands\SyncPermissionsCommand;
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
 use Javaabu\Permissions\Events\UserRoleUpdated;
 use Javaabu\Permissions\Listeners\LogRolePermissionsUpdate;
 use Javaabu\Permissions\Listeners\LogUserRoleUpdate;
+use Javaabu\Permissions\Policies\RolePolicy;
 use Javaabu\Permissions\Registry\PermissionRegistry;
+use Javaabu\Permissions\Routing\RoleRoutes;
+use Spatie\Permission\PermissionRegistrar;
 
 class PermissionsServiceProvider extends ServiceProvider
 {
@@ -34,6 +38,10 @@ class PermissionsServiceProvider extends ServiceProvider
         }
 
         $this->loadJsonTranslationsFrom(__DIR__ . '/../lang');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'permissions');
+
+        $this->registerRouteMacros();
+        $this->registerDefaultPermissions();
 
         $this->registerBladeDirectives();
         $this->registerActivityLogging();
@@ -67,6 +75,32 @@ class PermissionsServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../lang' => $this->app->langPath('vendor/permissions'),
         ], 'permissions-translations');
+
+        $this->publishes([
+            __DIR__ . '/../resources/views' => resource_path('views/vendor/permissions'),
+        ], 'permissions-views');
+    }
+
+    protected function registerRouteMacros(): void
+    {
+        Route::macro('roles', function (array $options = []) {
+            RoleRoutes::register($this, $options);
+        });
+    }
+
+    /**
+     * The package's own permissions (view_roles, edit_roles, delete_roles) and role policy
+     */
+    protected function registerDefaultPermissions(): void
+    {
+        if (! config('permissions.register_defaults', true)) {
+            return;
+        }
+
+        $registry = $this->app->make(PermissionRegistry::class);
+
+        $registry->resource('roles', 'roles', ['view', 'edit', 'delete'], label: 'Roles');
+        $registry->policy($this->app->make(PermissionRegistrar::class)->getRoleClass(), RolePolicy::class);
     }
 
     protected function registerBladeDirectives(): void

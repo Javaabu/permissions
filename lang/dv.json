@@ -1,4 +1,17 @@
 {
     "Other": "އެހެނިހެން",
-    "Super Admin": "ސުޕަރ އެޑްމިން"
+    "Super Admin": "ސުޕަރ އެޑްމިން",
+    "Roles": "ރޯލްތައް",
+    "View roles": "ރޯލްތައް ބެލުން",
+    "Edit roles": "ރޯލްތައް ބަދަލުކުރުން",
+    "Delete roles": "ރޯލްތައް ފޮހެލުން",
+    "Roles matching ':search'": "':search' އާ ގުޅޭ ރޯލްތައް",
+    "New role": "އައު ރޯލެއް",
+    "Role created": "ރޯލް އުފެއްދިއްޖެ",
+    "Role updated": "ރޯލް ބަދަލުކުރެވިއްޖެ",
+    "Role deleted": "ރޯލް ފޮހެލެވިއްޖެ",
+    "name": "ނަން",
+    "description": "ތަފްޞީލު",
+    "permissions": "ހުއްދަތައް",
+    "permission": "ހުއްދަ"
 }

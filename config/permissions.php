@@ -1,5 +1,7 @@
 <?php
 
+use Javaabu\Permissions\Http\Controllers\RolesController;
+
 return [
 
     /*
@@ -69,5 +71,43 @@ return [
     */
 
     'log_activity' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default permissions
+    |--------------------------------------------------------------------------
+    |
+    | Register this package's own permissions (view_roles, edit_roles,
+    | delete_roles) and its policy for the role model.
+    |
+    */
+
+    'register_defaults' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Views
+    |--------------------------------------------------------------------------
+    |
+    | Which stack the role pages render with: `blade` (javaabu/forms) or
+    | `inertia` (@javaabu/forms React pages shipped through javaabu/manifest).
+    |
+    */
+
+    'views' => 'blade',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Controllers
+    |--------------------------------------------------------------------------
+    |
+    | The controllers Route::roles() uses. Extend the package's controller to
+    | change its behaviour.
+    |
+    */
+
+    'controllers' => [
+        'roles' => RolesController::class,
+    ],
 
 ];
