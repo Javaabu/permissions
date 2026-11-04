@@ -21,7 +21,7 @@ A new migration, `add_translations_to_roles_table`, adds two nullable columns (`
 
 # javaabu/helpers and javaabu/activitylog are no longer required
 
-v2 required both. v3 doesn't, so that apps can move to the next versions of those packages independently. If you use them for anything else, require them yourself.
+v2 required both. v3 doesn't, so that apps can move to the next versions of those packages independently. If you use them for anything else, require them yourself. (javaabu/forms v2, which v3 requires, still installs javaabu/helpers for now; that's tracked in [Javaabu/forms#18](https://github.com/Javaabu/forms/issues/18).)
 
 - **Activity logging** of `role_updated` and `permissions_updated` now uses spatie/laravel-activitylog directly, when it's installed. javaabu/activitylog installs it, so if you still have it, logging keeps working. See [Activity log](advanced-usage/activity-log.md).
 - **`Role` no longer uses `LogsActivity`**, so changes to a role's name and description aren't logged. To keep logging them, [extend the model](advanced-usage/activity-log.md#logging-changes-to-the-role-itself).
