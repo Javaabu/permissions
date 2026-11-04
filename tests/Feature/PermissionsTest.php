@@ -13,13 +13,6 @@ class PermissionsTest extends TestCase
 {
     use InteractsWithDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->runMigrations();
-    }
-
     #[Test]
     public function it_can_check_if_a_user_has_a_permission(): void
     {

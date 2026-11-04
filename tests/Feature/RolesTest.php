@@ -3,7 +3,6 @@
 namespace Javaabu\Permissions\Tests\Feature;
 
 use Illuminate\Support\Facades\Event;
-use Javaabu\Activitylog\Models\Activity;
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
 use Javaabu\Permissions\Models\Permission;
 use Javaabu\Permissions\Models\Role;
@@ -11,17 +10,11 @@ use Javaabu\Permissions\Tests\InteractsWithDatabase;
 use Javaabu\Permissions\Tests\Models\User;
 use Javaabu\Permissions\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Activitylog\Models\Activity;
 
 class RolesTest extends TestCase
 {
     use InteractsWithDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->runMigrations();
-    }
 
     #[Test]
     public function it_can_sync_the_role_permissions(): void
@@ -126,7 +119,7 @@ class RolesTest extends TestCase
         ]);
 
         /** @var Activity $log */
-        $log = $role->activities()->latest('id')->first();
+        $log = Activity::query()->where('subject_type', $role->getMorphClass())->where('subject_id', $role->id)->latest('id')->first();
         $changes = $log->changes();
 
         $old = $changes->get('old');

@@ -6,33 +6,17 @@ use Javaabu\Permissions\Events\UserRoleUpdated;
 
 class LogUserRoleUpdate
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
-     * Handle the event.
-     *
-     * @return void
-     */
-    public function handle(UserRoleUpdated $event)
+    public function handle(UserRoleUpdated $event): void
     {
         $log = activity()->performedOn($event->subject);
 
-        if ($user = $event->causer) {
-            $log->causedBy($user);
+        if ($event->causer) {
+            $log->causedBy($event->causer);
         }
 
         $log->withProperties([
             'attributes' => ['role' => $event->new_role],
             'old' => ['role' => $event->old_role],
-        ])
-            ->log('role_updated');
+        ])->log('role_updated');
     }
 }

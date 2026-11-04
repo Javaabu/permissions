@@ -4,7 +4,6 @@ namespace Javaabu\Permissions\Tests\Feature;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
-use Javaabu\Activitylog\Models\Activity;
 use Javaabu\Permissions\Events\UserRoleUpdated;
 use Javaabu\Permissions\Models\Role;
 use Javaabu\Permissions\Tests\InteractsWithDatabase;
@@ -12,17 +11,11 @@ use Javaabu\Permissions\Tests\Models\User;
 use Javaabu\Permissions\Tests\Policies\UserPolicy;
 use Javaabu\Permissions\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Activitylog\Models\Activity;
 
 class HasRolesTest extends TestCase
 {
     use InteractsWithDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->runMigrations();
-    }
 
     #[Test]
     public function it_skips_fake_roles_when_setting_user_roles(): void
@@ -172,7 +165,7 @@ class HasRolesTest extends TestCase
         ]);
 
         /** @var Activity $log */
-        $log = $user->activities()->latest('id')->first();
+        $log = Activity::query()->where('subject_type', $user->getMorphClass())->where('subject_id', $user->id)->latest('id')->first();
         $changes = $log->changes();
 
         $old = $changes->get('old');

@@ -20,21 +20,23 @@
     "require": {
         "php": "^8.4",
         "illuminate/support": "^12.0 || ^13.0",
-        "spatie/laravel-permission": "^7.2",
-        "javaabu/helpers": "^1.70",
-        "javaabu/activitylog": "^1.5"
+        "spatie/laravel-permission": "^7.2"
     },
     "require-dev": {
         "javaabu/boost-javaabu-guidelines": "^1.0",
         "laravel/pint": "^1.24",
         "orchestra/testbench": "^10.0 || ^11.0",
-        "phpunit/phpunit": "^11.5.3 || ^12.5.8"
+        "phpunit/phpunit": "^11.5.3 || ^12.5.8",
+        "spatie/laravel-activitylog": "^4.10"
+    },
+    "suggest": {
+        "spatie/laravel-activitylog": "Logs role and permission changes (^4.10)"
     },
     "autoload": {
         "psr-4": {
             "Javaabu\\Permissions\\": "src/",
-            "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Javaabu\\Permissions\\Database\\Factories\\": "database/factories/",
+            "Javaabu\\Permissions\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
