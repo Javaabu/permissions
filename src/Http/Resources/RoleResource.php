@@ -20,7 +20,8 @@ class RoleResource extends JsonResource
             'guard_name' => $this->guard_name,
             'translations' => $this->when(Translations::supportsRole($this->resource), fn () => Translations::values($this->resource)),
             'permissions_count' => $this->whenCounted('permissions'),
-            'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
+            // Resolved here, so Inertia props aren't wrapped in `data` like a top-level collection
+            'permissions' => $this->whenLoaded('permissions', fn () => PermissionResource::collection($this->permissions)->resolve($request)),
             'can' => $this->abilities($request),
             'links' => $this->when(RoleRoutes::isRoleRoute($request), fn () => $this->links($request)),
             'created_at' => $this->created_at?->toIso8601String(),

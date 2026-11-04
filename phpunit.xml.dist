@@ -6,8 +6,13 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Test Suite">
+        <testsuite name="Package">
             <directory>tests</directory>
+            <exclude>tests/Translatable</exclude>
+        </testsuite>
+        <!-- Needs javaabu/translatable; CI also runs the Package suite without it -->
+        <testsuite name="Translatable">
+            <directory>tests/Translatable</directory>
         </testsuite>
     </testsuites>
     <source>
