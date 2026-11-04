@@ -10,7 +10,7 @@ use RecursiveIteratorIterator;
 class TranslationsTest extends TestCase
 {
     #[Test]
-    public function every_string_in_the_source_has_an_english_and_a_dhivehi_line(): void
+    public function every_string_in_the_source_and_views_has_an_english_and_a_dhivehi_line(): void
     {
         $en = json_decode(file_get_contents(__DIR__ . '/../../lang/en.json'), true);
         $dv = json_decode(file_get_contents(__DIR__ . '/../../lang/dv.json'), true);
@@ -41,17 +41,20 @@ class TranslationsTest extends TestCase
     protected function sourceKeys(): array
     {
         $keys = [];
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__DIR__ . '/../../src'));
 
-        foreach ($files as $file) {
-            if ($file->getExtension() !== 'php') {
-                continue;
-            }
+        foreach (['src', 'resources/views'] as $directory) {
+            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__DIR__ . '/../../' . $directory));
 
-            preg_match_all("/__\\('((?:[^'\\\\]|\\\\.)+)'/", file_get_contents($file->getPathname()), $matches);
+            foreach ($files as $file) {
+                if ($file->getExtension() !== 'php') {
+                    continue;
+                }
 
-            foreach ($matches[1] as $key) {
-                $keys[] = stripslashes($key);
+                preg_match_all("/__\\('((?:[^'\\\\]|\\\\.)+)'/", file_get_contents($file->getPathname()), $matches);
+
+                foreach ($matches[1] as $key) {
+                    $keys[] = stripslashes($key);
+                }
             }
         }
 
