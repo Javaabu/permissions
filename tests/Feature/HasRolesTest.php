@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Javaabu\Activitylog\Models\Activity;
 use Javaabu\Permissions\Events\UserRoleUpdated;
-use Javaabu\Permissions\Tests\InteractsWithDatabase;
 use Javaabu\Permissions\Models\Role;
+use Javaabu\Permissions\Tests\InteractsWithDatabase;
 use Javaabu\Permissions\Tests\Models\User;
 use Javaabu\Permissions\Tests\Policies\UserPolicy;
 use Javaabu\Permissions\Tests\TestCase;
@@ -17,7 +17,7 @@ class HasRolesTest extends TestCase
 {
     use InteractsWithDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,7 +53,7 @@ class HasRolesTest extends TestCase
         $role = new Role([
             'name' => 'Test Role',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role->save();
@@ -80,13 +80,13 @@ class HasRolesTest extends TestCase
         $role_1 = new Role([
             'name' => 'Test Role',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role_2 = new Role([
             'name' => 'Test Role 2',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role_1->save();
@@ -113,7 +113,7 @@ class HasRolesTest extends TestCase
     }
 
     #[Test]
-    function an_event_is_emitted_when_the_user_role_is_updated()
+    public function an_event_is_emitted_when_the_user_role_is_updated()
     {
         Event::fake();
 
@@ -125,7 +125,7 @@ class HasRolesTest extends TestCase
         $role = new Role([
             'name' => 'Test Role',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role->save();
@@ -146,7 +146,7 @@ class HasRolesTest extends TestCase
     }
 
     #[Test]
-    function it_logs_the_new_and_old_roles_when_a_user_role_is_updated()
+    public function it_logs_the_new_and_old_roles_when_a_user_role_is_updated()
     {
         Gate::policy(User::class, UserPolicy::class);
 
@@ -156,7 +156,7 @@ class HasRolesTest extends TestCase
         $role = new Role([
             'name' => 'Test Role',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role->save();

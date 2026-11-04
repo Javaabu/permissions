@@ -2,8 +2,8 @@
 
 namespace Javaabu\Permissions\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Arr;
 
 class UserRoleUpdated
@@ -34,10 +34,9 @@ class UserRoleUpdated
     /**
      * Create a new event instance.
      *
-     * @param string|array $old_role
-     * @param string|array $new_role
-     * @param $subject
-     * @param null $causer
+     * @param  string|array  $old_role
+     * @param  string|array  $new_role
+     * @param  null  $causer
      */
     public function __construct($old_role, $new_role, $subject, $causer = null)
     {

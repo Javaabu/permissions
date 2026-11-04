@@ -9,9 +9,9 @@ use Spatie\Activitylog\Traits\CausesActivity;
 
 class User extends Authenticatable
 {
+    use CausesActivity;
     use HasRoles;
     use LogsActivity;
-    use CausesActivity;
 
     protected $guarded = [];
 }

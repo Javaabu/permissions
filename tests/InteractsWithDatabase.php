@@ -2,6 +2,7 @@
 
 namespace Javaabu\Permissions\Tests;
 
+use CreateUsersTable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 trait InteractsWithDatabase
@@ -12,6 +13,6 @@ trait InteractsWithDatabase
     {
         include_once __DIR__ . '/database/create_users_table.php';
 
-        (new \CreateUsersTable)->up();
+        (new CreateUsersTable)->up();
     }
 }

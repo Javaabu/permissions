@@ -19,7 +19,6 @@ class LogUserRoleUpdate
     /**
      * Handle the event.
      *
-     * @param  UserRoleUpdated  $event
      * @return void
      */
     public function handle(UserRoleUpdated $event)
@@ -32,8 +31,8 @@ class LogUserRoleUpdate
 
         $log->withProperties([
             'attributes' => ['role' => $event->new_role],
-            'old' => ['role' => $event->old_role]
+            'old' => ['role' => $event->old_role],
         ])
-        ->log('role_updated');
+            ->log('role_updated');
     }
 }

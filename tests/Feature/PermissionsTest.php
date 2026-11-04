@@ -2,9 +2,9 @@
 
 namespace Javaabu\Permissions\Tests\Feature;
 
-use Javaabu\Permissions\Tests\InteractsWithDatabase;
 use Javaabu\Permissions\Models\Permission;
 use Javaabu\Permissions\Models\Role;
+use Javaabu\Permissions\Tests\InteractsWithDatabase;
 use Javaabu\Permissions\Tests\Models\User;
 use Javaabu\Permissions\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -13,7 +13,7 @@ class PermissionsTest extends TestCase
 {
     use InteractsWithDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class PermissionsTest extends TestCase
         $role = new Role([
             'name' => 'Test Role',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role->save();
@@ -38,7 +38,7 @@ class PermissionsTest extends TestCase
             'name' => 'test',
             'description' => 'Test description',
             'guard_name' => 'web',
-            'model' => 'test'
+            'model' => 'test',
         ]);
 
         $permission->save();
@@ -49,6 +49,4 @@ class PermissionsTest extends TestCase
 
         $this->assertTrue($user->can('test'));
     }
-
-
 }

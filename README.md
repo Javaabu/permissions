@@ -1,9 +1,9 @@
 # Permissions
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/javaabu/permissions.svg?style=flat-square)](https://packagist.org/packages/javaabu/permissions)
-[![Test Status](../../actions/workflows/run-tests.yml/badge.svg)](../../actions/workflows/run-tests.yml)
-[![Quality Score](https://img.shields.io/scrutinizer/g/javaabu/permissions.svg?style=flat-square)](https://scrutinizer-ci.com/g/javaabu/permissions)
-[![Total Downloads](https://img.shields.io/packagist/dt/javaabu/permissions.svg?style=flat-square)](https://packagist.org/packages/javaabu/permissions)
+[![Tests](https://github.com/Javaabu/permissions/actions/workflows/tests.yml/badge.svg?branch=next-gen)](https://github.com/Javaabu/permissions/actions/workflows/tests.yml?query=branch%3Anext-gen)
+[![codecov](https://codecov.io/gh/Javaabu/permissions/branch/next-gen/graph/badge.svg)](https://codecov.io/gh/Javaabu/permissions/tree/next-gen)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/javaabu/permissions.svg)](https://packagist.org/packages/javaabu/permissions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
 
 Modifications brought upon spatie/laravel-permissions
 

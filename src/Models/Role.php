@@ -2,6 +2,7 @@
 
 namespace Javaabu\Permissions\Models;
 
+use Database\Factories\RoleFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Javaabu\Activitylog\Traits\LogsActivity;
@@ -19,8 +20,6 @@ class Role extends BaseRole implements AdminModel
 
     /**
      * The attributes that would be logged
-     *
-     * @var array
      */
     protected static array $logAttributes = ['*'];
 
@@ -34,12 +33,10 @@ class Role extends BaseRole implements AdminModel
 
     /**
      * Create a new factory instance for the role model.
-     *
-     * @return Factory
      */
     protected static function newFactory(): Factory
     {
-        return \Database\Factories\RoleFactory::new();
+        return RoleFactory::new();
     }
 
     /**
@@ -52,7 +49,6 @@ class Role extends BaseRole implements AdminModel
 
     /**
      * Get name attribute
-     * @return string
      */
     public function getAdminLinkNameAttribute(): string
     {
@@ -61,8 +57,6 @@ class Role extends BaseRole implements AdminModel
 
     /**
      * Sync permissions
-     *
-     * @param  array  $permissions
      */
     public function syncPermissionIds(array $permissions): void
     {

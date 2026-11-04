@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 use Javaabu\Permissions\Models\Permission;
 
 class PermissionFactory extends Factory
@@ -17,7 +17,7 @@ class PermissionFactory extends Factory
 
         return [
             'model' => $suffix,
-            'name' =>  Str::slug("$prefix $suffix", '_'),
+            'name' => Str::slug("$prefix $suffix", '_'),
             'description' => fake()->sentence,
         ];
     }

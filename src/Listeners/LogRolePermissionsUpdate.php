@@ -19,7 +19,6 @@ class LogRolePermissionsUpdate
     /**
      * Handle the event.
      *
-     * @param  RolePermissionsUpdated  $event
      * @return void
      */
     public function handle(RolePermissionsUpdated $event)
@@ -32,8 +31,8 @@ class LogRolePermissionsUpdate
 
         $log->withProperties([
             'attributes' => ['permissions' => $event->new_permissions],
-            'old' => ['permissions' => $event->old_permissions]
+            'old' => ['permissions' => $event->old_permissions],
         ])
-        ->log('permissions_updated');
+            ->log('permissions_updated');
     }
 }

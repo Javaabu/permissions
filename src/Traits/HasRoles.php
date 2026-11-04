@@ -34,8 +34,7 @@ trait HasRoles
     /**
      * Update the role
      *
-     * @param $role
-     * @param bool $new whether creating user for the first time
+     * @param  bool  $new  whether creating user for the first time
      */
     public function updateRole($role, bool $new = false)
     {
@@ -78,9 +77,7 @@ trait HasRoles
     /**
      * Get all users with a specific permission
      *
-     * @param $query
-     * @param $permissions array|string
-     * @return mixed
+     * @param  $permissions  array|string
      */
     public function scopePermission($query, $permissions): mixed
     {
@@ -101,8 +98,6 @@ trait HasRoles
 
     /**
      * Get role attribute
-     *
-     * @return Role|null
      */
     public function getRoleAttribute(): ?Role
     {

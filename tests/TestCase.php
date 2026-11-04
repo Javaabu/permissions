@@ -7,14 +7,14 @@ use Javaabu\Activitylog\Models\Activity;
 use Javaabu\Helpers\HelpersServiceProvider;
 use Javaabu\Permissions\Models\Permission;
 use Javaabu\Permissions\Models\Role;
+use Javaabu\Permissions\PermissionsServiceProvider;
 use Javaabu\Permissions\Tests\Models\User;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Javaabu\Permissions\PermissionsServiceProvider;
+use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,15 +31,15 @@ abstract class TestCase extends BaseTestCase
         $this->app['config']->set('auth.guards', [
             'web' => [
                 'driver' => 'session',
-                'provider' => 'users'
-            ]
+                'provider' => 'users',
+            ],
         ]);
 
         $this->app['config']->set('auth.providers', [
             'users' => [
                 'driver' => 'eloquent',
                 'model' => User::class,
-            ]
+            ],
         ]);
 
     }
@@ -50,8 +50,8 @@ abstract class TestCase extends BaseTestCase
             HelpersServiceProvider::class,
             \Spatie\Activitylog\ActivitylogServiceProvider::class,
             ActivitylogServiceProvider::class,
-            \Spatie\Permission\PermissionServiceProvider::class,
-            PermissionsServiceProvider::class
+            PermissionServiceProvider::class,
+            PermissionsServiceProvider::class,
         ];
     }
 }

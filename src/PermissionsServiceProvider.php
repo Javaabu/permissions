@@ -18,7 +18,7 @@ class PermissionsServiceProvider extends ServiceProvider
             $this->registerMigrations();
 
             $this->publishes([
-                __DIR__.'/../database/migrations' => database_path('migrations'),
+                __DIR__ . '/../database/migrations' => database_path('migrations'),
             ], 'permissions-migrations');
 
             $this->publishes([
@@ -46,7 +46,7 @@ class PermissionsServiceProvider extends ServiceProvider
     protected function registerMigrations()
     {
         if (Permissions::$runsMigrations) {
-            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
     }
 
