@@ -85,12 +85,22 @@ Extends spatie's `Permission`. Scopes `forGuard(string $guard)` and `inGroup(str
 | Class | What |
 | --- | --- |
 | `Route::roles(array $options = [])` | Registers the role routes |
-| `Javaabu\Permissions\Routing\RoleRoutes` | `register()`, `guard(Request)`, `namePrefix(Request)` |
+| `Javaabu\Permissions\Routing\RoleRoutes` | `register()`, `guard(Request)`, `namePrefix(Request)`, `isRoleRoute(Request)` |
 | `Javaabu\Permissions\Http\Controllers\RolesController` | The role controller |
-| `Javaabu\Permissions\Http\Requests\RoleRequest` | Its validation |
-| `Javaabu\Permissions\Http\Resources\RoleResource`, `PermissionResource` | JSON shapes |
+| `Javaabu\Permissions\Http\Requests\RoleRequest` | Its validation; `role()` is the role being updated |
+| `Javaabu\Permissions\Http\Resources\RoleResource`, `PermissionResource` | JSON shapes; roles include `can`, `links` (on role routes), `permissions_count` (when counted) and `translations` (when translated) |
+| `Javaabu\Permissions\Support\Translations` | Optional translatable support: `enabled()`, `supports()`, `supportsRole()`, `rules()`, `values()`, `form()`. See [Translatable role descriptions](translatable-roles.md) |
+| `Javaabu\Permissions\Models\Translatable\Role` | A role with a translatable `description` |
 | `Javaabu\Permissions\Support\PermissionGroups` | `forGuard(string $guard, ?Model $role = null)`, `forRole(Model $role)` |
-| `Javaabu\Permissions\Views\ViewRenderer` | `render(string $page, array $data)`, `stack()`, `inertiaPage(string $page)` |
+| `Javaabu\Permissions\Views\ViewRenderer` | `render(string $page, array $data)`, `stack()`, `isInertia()`, `inertiaPage(string $page)` |
+
+# Front end
+
+| Asset | What |
+| --- | --- |
+| `permissions::roles` | Script of the Blade pages: `data-permission-group-select` buttons and `data-confirm` forms |
+| `permissions::Roles/Index`, `Create`, `Edit`, `Show` | The Inertia pages |
+| `@javaabu/permissions` | `RoleForm`, `PermissionGroupFields`, `RoleActions` and the types (`RoleData`, `PermissionGroup`, `RolesStrings`, …) |
 
 # Console and seeders
 

@@ -5,7 +5,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/javaabu/permissions.svg)](https://packagist.org/packages/javaabu/permissions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
 
-Roles, permissions and policies for Laravel apps and packages, built on [spatie/laravel-permission](https://spatie.be/docs/laravel-permission). Apps and packages register permissions, roles and default policies in code, and one command writes them to the database. Permissions are grouped and translatable, policies are overridable, everything works per guard with any number of user models, and roles come with routes, a JSON API and Blade or Inertia React pages.
+Roles, permissions and policies for Laravel apps and packages, built on [spatie/laravel-permission](https://spatie.be/docs/laravel-permission). Apps and packages register permissions, roles and default policies in code, and one command writes them to the database. Permissions are grouped and translatable, policies are overridable, everything works per guard with any number of user models, and roles come with routes, a JSON API and Blade ([javaabu/forms](https://github.com/Javaabu/forms)) or Inertia React ([@javaabu/forms](https://github.com/Javaabu/react-forms)) pages that work in Dhivehi and right to left. Role descriptions can be translated with [javaabu/translatable](https://github.com/Javaabu/translatable).
 
 ```php
 use Javaabu\Permissions\Permissions;
@@ -64,11 +64,14 @@ Route::middleware('web')->prefix('admin')->name('admin.')->group(function () {
 });
 ```
 
+The pages are Blade by default; set `'views' => 'inertia'` in `config/permissions.php` for the React pages. See [Managing roles](docs/basic-usage/managing-roles.md#pages).
+
 ## Testing
 
 ```bash
 composer test
 composer lint
+pnpm install && pnpm check   # the React pages
 ```
 
 ## Changelog

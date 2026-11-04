@@ -1,6 +1,6 @@
 # javaabu/permissions
 
-> Roles, permissions and policies for Laravel apps and packages, built on spatie/laravel-permission. Packages and apps register permissions, roles and default policies in code; `php artisan permissions:sync` writes them to the database. Permissions are grouped and have translatable descriptions; policies are overridable; everything works per guard with any number of user models. Includes role management routes, an overridable controller, a JSON API and Blade or Inertia pages.
+> Roles, permissions and policies for Laravel apps and packages, built on spatie/laravel-permission. Packages and apps register permissions, roles and default policies in code; `php artisan permissions:sync` writes them to the database. Permissions are grouped and have translatable descriptions; policies are overridable; everything works per guard with any number of user models. Includes role management routes, an overridable controller, a JSON API, and Blade (javaabu/forms) or Inertia React (@javaabu/forms) pages that work in Dhivehi and right to left. Role descriptions can be translated with javaabu/translatable.
 
 Paths are relative to this file. In a project, that's vendor/javaabu/permissions/.
 
@@ -16,6 +16,9 @@ Paths are relative to this file. In a project, that's vendor/javaabu/permissions
 - User models use `Javaabu\Permissions\Traits\HasRoles`, not spatie's trait directly.
 - Role routes come from `Route::roles(['guard' => 'web_admin'])` inside the app's route group; they aren't loaded automatically.
 - Role names are ASCII identifiers (`editor`); role descriptions may be in Thaana.
+- The role pages render with `config('permissions.views')`: `blade` (javaabu/forms v2 components, extending `permissions.layout`) or `inertia` (React pages `permissions::Roles/Index`, `Create`, `Edit`, `Show`, resolved with javaabu/manifest's `resolvePage()`). Override a Blade view with `vendor:publish --tag=permissions-views`, a React page with `php artisan manifest:override permissions js/Pages/Roles/Edit.tsx`.
+- Use logical Tailwind utilities (`ms-`, `pe-`, `text-start`) in overridden views, never `ml-`/`text-left`.
+- With javaabu/translatable, set `permission.models.role` to `Javaabu\Permissions\Models\Translatable\Role`; forms then send `description_en`, `description_dv`. Check support with `Javaabu\Permissions\Support\Translations::supportsRole()`, never by calling translatable classes directly.
 
 ## Docs
 
@@ -28,13 +31,14 @@ Paths are relative to this file. In a project, that's vendor/javaabu/permissions
 - [Roles](docs/basic-usage/roles.md): defining roles in config and code, updateRole(), syncPermissionIds(), scopes, events
 - [Policies](docs/basic-usage/policies.md): Permissions::policy(), overriding, ResourcePolicy, custom abilities, ownership, the role policy
 - [Checking permissions](docs/basic-usage/checking-permissions.md): can(), anyPermission(), @anypermission, Permissions::check()
-- [Managing roles](docs/basic-usage/managing-roles.md): Route::roles(), authorization, validation, JSON API, pages and props
+- [Managing roles](docs/basic-usage/managing-roles.md): Route::roles(), authorization, validation, JSON API, setting up the Blade and Inertia React pages, page props, React components
 - [For package authors](docs/advanced-usage/for-package-authors.md): a complete package example and rules
 - [Multiple guards](docs/advanced-usage/multi-auth.md): guards config, guardFor(), checking against a guard, routes per guard
 - [Configuration](docs/advanced-usage/configuration.md): every option in config/permissions.php and spatie's config
-- [Overriding controllers and views](docs/advanced-usage/overriding-controllers-and-views.md): custom controllers, Blade overrides, Inertia pages
+- [Overriding controllers and views](docs/advanced-usage/overriding-controllers-and-views.md): custom controllers, Blade view overrides, overriding React pages with manifest:override
 - [Activity log](docs/advanced-usage/activity-log.md): optional logging with spatie/laravel-activitylog
-- [Dhivehi and translations](docs/advanced-usage/translations.md): translating descriptions and labels, strings to review
+- [Dhivehi and translations](docs/advanced-usage/translations.md): translating descriptions and labels, right to left, strings to review
+- [Translatable role descriptions](docs/advanced-usage/translatable-roles.md): optional javaabu/translatable support, the translatable Role model, per-language fields
 - [API reference](docs/advanced-usage/api-reference.md): every public class and method
 - [AI assistants](docs/ai-assistants.md): Laravel Boost, and using these docs from other assistants
 - [Questions and Security](docs/questions-and-security.md): where to get help

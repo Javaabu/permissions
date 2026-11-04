@@ -36,6 +36,9 @@ A subclass can override any action, or one of these helpers:
 | `query(Request $request): Builder` | The roles the routes can see; scoped to the guard |
 | `findRole(Request $request, string $role): Model` | Finds a role or 404s |
 | `form(Request $request, ?Model $role)` | Renders the create and edit pages |
+| `attributes(RoleRequest $request): array` | The validated attributes saved on the role |
+| `meta(Request $request, ?Model $role = null): array` | The props every page gets: `guard`, `routes`, `urls`, `can`, `strings` |
+| `strings(): array` | The translated text of the Inertia pages |
 | `routeNames(Request $request): array` | The route names passed to pages |
 
 ```php
@@ -63,6 +66,8 @@ class RolesController extends BaseRolesController
 'views' => 'inertia', // or 'blade'
 ```
 
+Requests that expect JSON always get JSON. Setting up each stack is described in [Managing roles](../basic-usage/managing-roles.md#pages).
+
 # Blade views
 
 Publish the views and edit the copies:
@@ -71,21 +76,16 @@ Publish the views and edit the copies:
 php artisan vendor:publish --tag=permissions-views
 ```
 
-Laravel uses `resources/views/vendor/permissions/roles/index.blade.php` in place of the package's. You can override one view and leave the rest. The [page props](../basic-usage/managing-roles.md#pages) list what each view gets.
+Laravel uses `resources/views/vendor/permissions/roles/index.blade.php` in place of the package's. Override one view and leave the rest: `roles.index`, `roles.create`, `roles.edit`, `roles.show`, and the partials `roles.partials.form`, `roles.partials.row`, `roles.partials.actions`, `roles.partials.alerts` and `roles.partials.translatable-description`. Keep the `data-permission-group` and `data-permission-group-select` attributes for select all and none, and `data-confirm` on forms that should ask first. The [page props](../basic-usage/managing-roles.md#page-props) list what each view gets.
 
 # Inertia pages
 
-The pages render as `permissions::Roles/Index`, `permissions::Roles/Create`, `permissions::Roles/Show` and `permissions::Roles/Edit`. Your Inertia page resolver decides which component each name loads. To use your own page, resolve the name to your component before the package's:
+Copy a page into your app and edit it:
 
-```ts
-// resources/js/app.tsx
-resolve: (name) => {
-    const pages = import.meta.glob('./Pages/**/*.tsx', { eager: true });
-
-    if (name === 'permissions::Roles/Edit') {
-        return pages['./Pages/Admin/Roles/Edit.tsx'];
-    }
-
-    return pages[`./Pages/${name}.tsx`];
-},
+```bash
+php artisan manifest:override permissions js/Pages/Roles/Edit.tsx
 ```
+
+It goes to `resources/vendor/permissions/js/Pages/Roles/Edit.tsx`, and `resolvePage()` uses it instead of the package's. Components work the same way (`js/components/RoleForm.tsx`), and the pages pick up your copy.
+
+To give the pages more props, override `meta()` or an action in your controller.

@@ -85,6 +85,14 @@ curl -H 'Accept: application/json' https://example.test/admin/roles?search=edito
             "description": "ލިޔުންތައް ބަދަލުކުރާ މީހުން",
             "translated_description": "ލިޔުންތައް ބަދަލުކުރާ މީހުން",
             "guard_name": "web_admin",
+            "permissions_count": 3,
+            "can": { "view": true, "update": true, "delete": false },
+            "links": {
+                "show": "https://example.test/admin/roles/2",
+                "edit": "https://example.test/admin/roles/2/edit",
+                "update": "https://example.test/admin/roles/2",
+                "destroy": "https://example.test/admin/roles/2"
+            },
             "created_at": "2026-11-04T10:00:00+05:00",
             "updated_at": "2026-11-04T10:00:00+05:00"
         }
@@ -97,10 +105,10 @@ curl -H 'Accept: application/json' https://example.test/admin/roles?search=edito
 | Request | Response |
 | --- | --- |
 | `GET /roles?search=&per_page=` | Paginated `RoleResource`s, up to 100 per page |
-| `GET /roles/create` | `{ "data": { "role": null, "permission_groups": [...], "guard": "web_admin" } }` |
+| `GET /roles/create` | `{ "data": { "role": null, "permission_groups": [...], "guard": "web_admin", "translations": null } }` |
 | `POST /roles` | `201` with the role and its `permissions` |
 | `GET /roles/{role}` | The role and its `permissions` |
-| `GET /roles/{role}/edit` | `{ "data": { "role": {...}, "permission_groups": [...], "guard": "…" } }` |
+| `GET /roles/{role}/edit` | `{ "data": { "role": {...}, "permission_groups": [...], "guard": "…", "translations": null } }` |
 | `PUT/PATCH /roles/{role}` | The updated role |
 | `DELETE /roles/{role}` | `204` |
 
@@ -116,29 +124,133 @@ curl -H 'Accept: application/json' https://example.test/admin/roles?search=edito
 }
 ```
 
-Labels and descriptions are translated into the current locale.
+Labels and descriptions are translated into the current locale. `can` says what the current user may do with each role, and `links` holds the URLs of its pages under the route names you registered. When descriptions are [translated](../advanced-usage/translatable-roles.md), roles also have `translations` (`{ "description_en": …, "description_dv": … }`) and the form data has the inputs for each language.
 
 # Pages
 
-Without JSON, the actions render pages with the stack in `config('permissions.views')`: Blade views (`permissions::roles.index`) or Inertia pages (`permissions::Roles/Index`). Once saved, `store` and `update` redirect to the edit page and `destroy` to the index, each with a translated `success` flash message.
+Without JSON, the actions render pages with the stack in `config('permissions.views')`: Blade (the default) or Inertia React. Once saved, `store` and `update` redirect to the edit page and `destroy` to the index, each with a translated `success` flash message.
 
 | Page | Blade view | Inertia page |
 | --- | --- | --- |
-| List | `permissions::roles.index` | `permissions::Roles/Index` |
+| List, with search | `permissions::roles.index` | `permissions::Roles/Index` |
 | New | `permissions::roles.create` | `permissions::Roles/Create` |
-| View | `permissions::roles.show` | `permissions::Roles/Show` |
+| View, with the granted permissions | `permissions::roles.show` | `permissions::Roles/Show` |
 | Edit | `permissions::roles.edit` | `permissions::Roles/Edit` |
 
-Each page gets:
+The form has the role's name and description, and a card of permission checkboxes for each group, with **Select all** and **Select none**. Buttons only show when the user may use them, and deleting asks first.
+
+## Blade
+
+The views are built with [javaabu/forms](https://github.com/Javaabu/forms) v2 components, so they follow your `forms.framework` (Onu or Bootstrap 6). They extend your layout:
+
+```php
+// config/permissions.php
+'views' => 'blade',
+'layout' => 'layouts.app',     // the view the pages @extends
+'layout_section' => 'content', // the section they fill
+```
+
+```blade
+{{-- resources/views/layouts/app.blade.php --}}
+<!DOCTYPE html>
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'dv' ? 'rtl' : 'ltr' }}">
+<head><title>{{ $title ?? config('app.name') }}</title></head>
+<body>
+    @yield('content')
+</body>
+</html>
+```
+
+A small script, `permissions::roles` (select all and none, and the delete confirmation), comes through [javaabu/manifest](https://github.com/Javaabu/manifest). The pages require it themselves; add manifest's Vite plugin to your build:
+
+```js
+// vite.config.js
+import { defineConfig } from "vite"
+import laravel from "laravel-vite-plugin"
+import manifest from "./vendor/javaabu/manifest/dist/vite.js"
+
+export default defineConfig({
+    plugins: [
+        laravel({ input: ["resources/css/app.css", "resources/js/app.js"] }),
+        manifest(),
+    ],
+})
+```
+
+The pages use Tailwind utilities from Onu's theme, logical ones only (`ms-`, `text-start`), so they work right to left. Let Tailwind see them:
+
+```css
+/* resources/css/app.css */
+@source "../../vendor/javaabu/permissions/resources/views";
+```
+
+## Inertia React
+
+```php
+// config/permissions.php
+'views' => 'inertia',
+```
+
+The pages are written in TypeScript with [@javaabu/forms](https://github.com/Javaabu/react-forms) and ship inside the Composer package; javaabu/manifest makes them available to your build. Resolve them with `resolvePage()`:
+
+```tsx
+// resources/js/app.tsx
+import { createInertiaApp } from "@inertiajs/react"
+import { resolvePage } from "@javaabu/manifest/inertia"
+import { createRoot } from "react-dom/client"
+
+createInertiaApp({
+    resolve: (name) => resolvePage(name, import.meta.glob("./pages/**/*.tsx")),
+    setup({ el, App, props }) {
+        createRoot(el).render(<App {...props} />)
+    },
+})
+```
+
+Install what the pages need, then check:
+
+```bash
+composer require inertiajs/inertia-laravel
+php artisan manifest:check   # prints the install command for anything missing
+```
+
+They need `@javaabu/forms`, `@javaabu/onu`, `react`, `react-dom` and `@inertiajs/react`. Wrap your app in `FormsProvider` with the Onu and Inertia adapters, as @javaabu/forms describes, so forms submit as Inertia visits. Your persistent layout wraps the pages and shows the `success` flash message as it does for your own pages.
+
+The pages' text comes from the server, translated, in the `strings` prop, so they're in Dhivehi when the app's locale is `dv`.
+
+You can use the pages' parts in your own pages:
+
+```tsx
+import { PermissionGroupFields, RoleActions, RoleForm } from "@javaabu/permissions"
+import type { PermissionGroup, RoleData } from "@javaabu/permissions"
+
+export default function EditRole({ role, permission_groups, translations, strings, urls }) {
+    return (
+        <RoleForm
+            role={role}
+            action={urls.update}
+            permissionGroups={permission_groups}
+            translations={translations}
+            strings={strings}
+        />
+    )
+}
+```
+
+## Page props
 
 | Prop | Pages | What |
 | --- | --- | --- |
 | `title` | all | The translated page title |
 | `guard` | all | The guard the routes manage |
 | `routes` | all | Route names by action, e.g. `routes.edit` is `admin.roles.edit` |
+| `urls` | all | `index`, `create` and `store`, plus `show`, `edit`, `update` and `destroy` on a role's pages |
+| `can` | all | `{ create, update, delete }` for the current user; `update` and `delete` are about the page's role |
+| `strings` | all (Inertia only) | The pages' translated text |
 | `roles` | index | A paginator (Blade) or a paginated `RoleResource` collection (Inertia) |
 | `search` | index | The search term, or null |
 | `role` | create, show, edit | The role model (Blade) or a `RoleResource` array (Inertia); null on create |
 | `permission_groups` | create, show, edit | As in the JSON above; on show, only the role's permissions |
+| `translations` | create, edit | `{ values, inputs }` when descriptions are [translated](../advanced-usage/translatable-roles.md), otherwise null |
 
 To change the pages, see [Overriding controllers and views](../advanced-usage/overriding-controllers-and-views.md).

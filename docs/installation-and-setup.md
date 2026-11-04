@@ -9,11 +9,11 @@ sidebar_position: 1.2
 composer require javaabu/permissions
 ```
 
-The service provider is discovered automatically, and so is spatie/laravel-permission's.
+The service provider is discovered automatically, and so are those of spatie/laravel-permission, javaabu/forms and javaabu/manifest. Until javaabu/forms v2 and javaabu/manifest are on Packagist, add their repositories first (see [Requirements](requirements.md)).
 
 # Migrating
 
-The package loads its migrations itself. They create spatie's tables, plus a `description` column on `roles` and `permissions` and a `model` column (the permission group) on `permissions`.
+The package loads its migrations itself. They create spatie's tables, plus a `description` column on `roles` and `permissions`, a `model` column (the permission group) on `permissions`, and the nullable `translations` and `lang` columns on `roles` for [translatable descriptions](advanced-usage/translatable-roles.md).
 
 ```bash
 php artisan migrate

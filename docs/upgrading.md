@@ -13,6 +13,12 @@ PHP 8.4 and Laravel 12 or 13.
 composer require javaabu/permissions:^3.0
 ```
 
+# New dependencies and a migration
+
+v3 requires javaabu/forms v2 (the Blade pages) and javaabu/manifest (the page assets). Until they're on Packagist, add their repositories as shown in [Requirements](requirements.md).
+
+A new migration, `add_translations_to_roles_table`, adds two nullable columns (`translations` and `lang`) to the roles table, for [translatable role descriptions](advanced-usage/translatable-roles.md). It runs with your other migrations and is harmless without translatable. If you publish the package's migrations, publish again to get it.
+
 # javaabu/helpers and javaabu/activitylog are no longer required
 
 v2 required both. v3 doesn't, so that apps can move to the next versions of those packages independently. If you use them for anything else, require them yourself.
@@ -125,4 +131,4 @@ class UserPolicy extends ResourcePolicy
 
 # Role management
 
-v3 has its own [role routes, controller and pages](basic-usage/managing-roles.md). Your existing `RolesController` keeps working. To switch, delete it and register `Route::roles(['guard' => 'web_admin'])` in your admin route group.
+v3 has its own [role routes, controller and pages](basic-usage/managing-roles.md), in Blade (javaabu/forms v2) and Inertia React. Your existing `RolesController` and views keep working. To switch, delete them and register `Route::roles(['guard' => 'web_admin'])` in your admin route group, then set `permissions.layout` to your admin layout. v2's views (`admin.roles.*`) aren't used by the package; copy anything you customized into the published `roles` views.
