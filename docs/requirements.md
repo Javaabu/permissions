@@ -11,7 +11,7 @@ Optional:
 
 | Package | For |
 | --- | --- |
-| [spatie/laravel-activitylog](https://spatie.be/docs/laravel-activitylog) ^4.10 | [Logging role and permission changes](advanced-usage/activity-log.md) |
+| [spatie/laravel-activitylog](https://spatie.be/docs/laravel-activitylog) ^4.10 or ^5.0 | [Logging role and permission changes](advanced-usage/activity-log.md) |
 | [inertiajs/inertia-laravel](https://inertiajs.com) ^2.0 | Rendering the [role pages](basic-usage/managing-roles.md) with Inertia React (with `@javaabu/forms`, `@javaabu/onu`, React 18.3 or 19 and `@inertiajs/react` 2 or 3 in your app) |
 | [javaabu/translatable](https://github.com/Javaabu/translatable) ^3.0 | [Translating role descriptions](advanced-usage/translatable-roles.md) |
 

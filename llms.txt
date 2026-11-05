@@ -36,7 +36,7 @@ Paths are relative to this file. In a project, that's vendor/javaabu/permissions
 - [Multiple guards](docs/advanced-usage/multi-auth.md): guards config, guardFor(), checking against a guard, routes per guard
 - [Configuration](docs/advanced-usage/configuration.md): every option in config/permissions.php and spatie's config
 - [Overriding controllers and views](docs/advanced-usage/overriding-controllers-and-views.md): custom controllers, Blade view overrides, overriding React pages with manifest:override
-- [Activity log](docs/advanced-usage/activity-log.md): optional logging with spatie/laravel-activitylog
+- [Activity log](docs/advanced-usage/activity-log.md): optional logging with spatie/laravel-activitylog v4 or v5
 - [Dhivehi and translations](docs/advanced-usage/translations.md): translating descriptions and labels, right to left, strings to review
 - [Translatable role descriptions](docs/advanced-usage/translatable-roles.md): optional javaabu/translatable support, the translatable Role model, per-language fields
 - [API reference](docs/advanced-usage/api-reference.md): every public class and method

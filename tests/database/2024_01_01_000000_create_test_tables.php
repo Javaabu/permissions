@@ -36,6 +36,8 @@ return new class extends Migration
             $table->nullableMorphs('subject', 'subject');
             $table->string('event')->nullable();
             $table->nullableMorphs('causer', 'causer');
+            // spatie/laravel-activitylog v5; v4 doesn't use it
+            $table->json('attribute_changes')->nullable();
             $table->json('properties')->nullable();
             $table->uuid('batch_uuid')->nullable();
             $table->timestamps();

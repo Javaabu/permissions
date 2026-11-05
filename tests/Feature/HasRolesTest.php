@@ -166,7 +166,7 @@ class HasRolesTest extends TestCase
 
         /** @var Activity $log */
         $log = Activity::query()->where('subject_type', $user->getMorphClass())->where('subject_id', $user->id)->latest('id')->first();
-        $changes = $log->changes();
+        $changes = $this->loggedChanges($log);
 
         $old = $changes->get('old');
         $new = $changes->get('attributes');

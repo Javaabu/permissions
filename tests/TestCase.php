@@ -2,6 +2,7 @@
 
 namespace Javaabu\Permissions\Tests;
 
+use Illuminate\Support\Collection;
 use Javaabu\Forms\FormsServiceProvider;
 use Javaabu\Manifest\ManifestServiceProvider;
 use Javaabu\Permissions\Models\Permission;
@@ -12,6 +13,7 @@ use Javaabu\Permissions\Tests\Models\Admin;
 use Javaabu\Permissions\Tests\Models\User;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Spatie\Activitylog\ActivitylogServiceProvider;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends BaseTestCase
@@ -67,5 +69,20 @@ abstract class TestCase extends BaseTestCase
             ManifestServiceProvider::class,
             FormsServiceProvider::class,
         ];
+    }
+
+    /**
+     * The logged before and after values: `attribute_changes` on spatie/laravel-activitylog v5,
+     * `properties` on v4
+     */
+    protected function loggedChanges(Activity $log): Collection
+    {
+        if (method_exists($log, 'changes')) {
+            return $log->changes();
+        }
+
+        $this->assertNull($log->properties?->get('attributes'), 'v5 keeps the changes out of properties');
+
+        return $log->attribute_changes;
     }
 }

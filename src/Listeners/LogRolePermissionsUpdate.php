@@ -3,9 +3,12 @@
 namespace Javaabu\Permissions\Listeners;
 
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
+use Javaabu\Permissions\Listeners\Concerns\LogsChanges;
 
 class LogRolePermissionsUpdate
 {
+    use LogsChanges;
+
     public function handle(RolePermissionsUpdated $event): void
     {
         $log = activity()->performedOn($event->role);
@@ -14,9 +17,10 @@ class LogRolePermissionsUpdate
             $log->causedBy($event->causer);
         }
 
-        $log->withProperties([
-            'attributes' => ['permissions' => $event->new_permissions],
-            'old' => ['permissions' => $event->old_permissions],
-        ])->log('permissions_updated');
+        $this->withChanges(
+            $log,
+            ['permissions' => $event->new_permissions],
+            ['permissions' => $event->old_permissions],
+        )->log('permissions_updated');
     }
 }

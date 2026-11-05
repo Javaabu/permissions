@@ -120,7 +120,7 @@ class RolesTest extends TestCase
 
         /** @var Activity $log */
         $log = Activity::query()->where('subject_type', $role->getMorphClass())->where('subject_id', $role->id)->latest('id')->first();
-        $changes = $log->changes();
+        $changes = $this->loggedChanges($log);
 
         $old = $changes->get('old');
         $new = $changes->get('attributes');

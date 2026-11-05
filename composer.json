@@ -45,10 +45,10 @@
         "laravel/pint": "^1.24",
         "orchestra/testbench": "^10.0 || ^11.0",
         "phpunit/phpunit": "^11.5.3 || ^12.5.8",
-        "spatie/laravel-activitylog": "^4.10"
+        "spatie/laravel-activitylog": "^4.10 || ^5.0"
     },
     "suggest": {
-        "spatie/laravel-activitylog": "Logs role and permission changes (^4.10)",
+        "spatie/laravel-activitylog": "Logs role and permission changes (^4.10 or ^5.0)",
         "inertiajs/inertia-laravel": "Renders the role pages with Inertia React when permissions.views is inertia (^2.0)",
         "javaabu/translatable": "Translates role descriptions (^3.0)"
     },

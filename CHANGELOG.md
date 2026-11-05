@@ -15,6 +15,6 @@ All notable changes will be documented in this file. See [docs/upgrading.md](doc
 - `RoleResource` includes `can`, `links` and `permissions_count`
 - Optional javaabu/translatable support for role descriptions: `Models\Translatable\Role`, `Support\Translations`, and a migration adding `translations` and `lang` to the roles table
 - Dhivehi translations
-- Activity logging is optional, through spatie/laravel-activitylog
+- Activity logging is optional, through spatie/laravel-activitylog v4 or v5; on v5 the changes go in `attribute_changes`
 - Requires PHP 8.4, Laravel 12 or 13, javaabu/forms v2 and javaabu/manifest
 - Breaking: no longer requires javaabu/helpers or javaabu/activitylog; `Role` no longer implements `AdminModel` or uses `LogsActivity`; factories moved to `Javaabu\Permissions\Database\Factories`; `updateRole()` no longer reads `get_setting()`
