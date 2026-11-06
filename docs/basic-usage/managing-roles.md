@@ -177,6 +177,8 @@ export default defineConfig({
 })
 ```
 
+The script imports no npm packages, so the Blade pages need nothing beyond what javaabu/forms' Blade components need. `php artisan manifest:check` doesn't ask a Blade app for React, `@inertiajs/react` or `@javaabu/forms`: permissions declares those for its React pages only, and the check skips them while the app's `package.json` has no Inertia adapter.
+
 The pages use Tailwind utilities from Onu's theme, logical ones only (`ms-`, `text-start`), so they work right to left. Let Tailwind see them:
 
 ```css
@@ -214,7 +216,7 @@ composer require inertiajs/inertia-laravel
 php artisan manifest:check   # prints the install command for anything missing
 ```
 
-They need `@javaabu/forms`, `@javaabu/onu`, `react`, `react-dom` and `@inertiajs/react`. Wrap your app in `FormsProvider` with the Onu and Inertia adapters, as @javaabu/forms describes, so forms submit as Inertia visits. Your persistent layout wraps the pages and shows the `success` flash message as it does for your own pages.
+They need `@javaabu/forms`, `@javaabu/onu`, `react`, `react-dom` and `@inertiajs/react`, and so do the components you import from `@javaabu/permissions`. `manifest:check` lists them once your `package.json` has `@inertiajs/react`; before that, run `php artisan manifest:check --scope=pages`. Wrap your app in `FormsProvider` with the Onu and Inertia adapters, as @javaabu/forms describes, so forms submit as Inertia visits. Your persistent layout wraps the pages and shows the `success` flash message as it does for your own pages.
 
 The pages' text comes from the server, translated, in the `strings` prop, so they're in Dhivehi when the app's locale is `dv`.
 

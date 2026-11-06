@@ -11,6 +11,7 @@ All notable changes will be documented in this file. See [docs/upgrading.md](doc
 - Multi-auth: `permissions.guards`, per-group and per-role guards, `Permissions::guardFor()`, `Permissions::check()`, guard-aware `anyPermission()` and `@anypermission`
 - Role management: `Route::roles()`, an overridable `RolesController` with a JSON API
 - Role pages in Blade (javaabu/forms v2) and Inertia React (@javaabu/forms, shipped through javaabu/manifest), right-to-left ready, with select all per permission group; `permissions.layout` and `layout_section` options
+- npm dependencies (`@javaabu/forms`, `@javaabu/onu`, React, `@inertiajs/react`) are declared for the React pages only, so `php artisan manifest:check` doesn't ask Blade apps for them
 - React components for apps: `RoleForm`, `PermissionGroupFields`, `RoleActions` from `@javaabu/permissions`
 - `RoleResource` includes `can`, `links` and `permissions_count`
 - Optional javaabu/translatable support for role descriptions: `Models\Translatable\Role`, `Support\Translations`, and a migration adding `translations` and `lang` to the roles table

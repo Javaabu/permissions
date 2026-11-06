@@ -115,8 +115,8 @@ Route::middleware('web')->prefix('admin')->name('admin.')->group(function () {
 
 Every action also answers JSON. Pages render with `config('permissions.views')`:
 
-- `blade`: javaabu/forms v2 views extending `config('permissions.layout')` (`layouts.app`), section `content`. The app needs manifest's Vite plugin (`vendor/javaabu/manifest/dist/vite.js`) and `@source "../../vendor/javaabu/permissions/resources/views";` in its CSS.
-- `inertia`: React pages `permissions::Roles/Index`, `Create`, `Edit`, `Show`. The app resolves them with `resolvePage(name, import.meta.glob("./pages/**/*.tsx"))` from `@javaabu/manifest/inertia`, wraps the app in @javaabu/forms' `FormsProvider`, and installs what `php artisan manifest:check` lists.
+- `blade`: javaabu/forms v2 views extending `config('permissions.layout')` (`layouts.app`), section `content`. The app needs manifest's Vite plugin (`vendor/javaabu/manifest/dist/vite.js`) and `@source "../../vendor/javaabu/permissions/resources/views";` in its CSS. No React packages: permissions declares its npm deps `for: 'pages'`, so `manifest:check` doesn't ask Blade apps for them.
+- `inertia`: React pages `permissions::Roles/Index`, `Create`, `Edit`, `Show`. The app resolves them with `resolvePage(name, import.meta.glob("./pages/**/*.tsx"))` from `@javaabu/manifest/inertia`, wraps the app in @javaabu/forms' `FormsProvider`, and installs what `php artisan manifest:check` lists (`@javaabu/forms`, `@javaabu/onu`, React, `@inertiajs/react`; add `--scope=pages` if `@inertiajs/react` isn't in `package.json` yet).
 
 Override a Blade view with `php artisan vendor:publish --tag=permissions-views`; a React page with `php artisan manifest:override permissions js/Pages/Roles/Edit.tsx`. Reuse the form in your own React pages with `import { RoleForm, PermissionGroupFields } from "@javaabu/permissions"`. Override the controller with `config('permissions.controllers.roles')` and a subclass of `Javaabu\Permissions\Http\Controllers\RolesController` (`meta()` for extra props). In overridden views use logical utilities (`ms-`, `text-start`) so pages work right to left.
 

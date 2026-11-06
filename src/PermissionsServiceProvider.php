@@ -93,6 +93,9 @@ class PermissionsServiceProvider extends ServiceProvider
                 ->script('roles', 'js/roles.ts')
                 ->js()
                 ->pages()
+                // roles.ts (the Blade script) imports nothing; only the Inertia pages and the
+                // components apps import from @javaabu/permissions need these, so Blade apps
+                // aren't asked to install them. Onu is a peer of @javaabu/forms.
                 ->npm([
                     '@javaabu/forms' => 'github:Javaabu/react-forms#next-gen',
                     '@javaabu/onu' => '^0.2.1',
@@ -100,7 +103,7 @@ class PermissionsServiceProvider extends ServiceProvider
                     'react' => '^18.3 || ^19.0',
                     'react-dom' => '^18.3 || ^19.0',
                     '@inertiajs/react' => '^2.0 || ^3.0',
-                ]);
+                ], for: 'pages');
         });
     }
 
