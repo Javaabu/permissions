@@ -2,85 +2,98 @@
 
 namespace Javaabu\Permissions\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Javaabu\Activitylog\Traits\LogsActivity;
-use Javaabu\Helpers\AdminModel\AdminModel;
-use Javaabu\Helpers\AdminModel\IsAdminModel;
+use Illuminate\Database\Eloquent\Model;
+use Javaabu\Permissions\Database\Factories\RoleFactory;
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role as BaseRole;
+use Spatie\Permission\PermissionRegistrar;
 
-class Role extends BaseRole implements AdminModel
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $guard_name
+ * @property string|null $description
+ */
+class Role extends BaseRole
 {
     use HasFactory;
-    use IsAdminModel;
-    use LogsActivity;
 
-    /**
-     * The attributes that would be logged
-     *
-     * @var array
-     */
-    protected static array $logAttributes = ['*'];
-
-    /**
-     * Searchable fields
-     */
+    /** @var array<int, string> */
     protected array $searchable = [
         'name',
         'description',
     ];
 
-    /**
-     * Create a new factory instance for the role model.
-     *
-     * @return Factory
-     */
     protected static function newFactory(): Factory
     {
-        return \Database\Factories\RoleFactory::new();
+        return RoleFactory::new();
     }
 
     /**
-     * Get the admin url attribute
+     * Roles of a guard
      */
-    public function getAdminUrlAttribute(): string
+    public function scopeForGuard(Builder $query, string $guard): Builder
     {
-        return route('admin.roles.show', $this);
+        return $query->where('guard_name', $guard);
     }
 
     /**
-     * Get name attribute
-     * @return string
+     * Roles whose name or description contains the search term
      */
-    public function getAdminLinkNameAttribute(): string
+    public function scopeSearch(Builder $query, ?string $search): Builder
     {
-        return $this->description;
-    }
-
-    /**
-     * Sync permissions
-     *
-     * @param  array  $permissions
-     */
-    public function syncPermissionIds(array $permissions): void
-    {
-        $old_permissions = $this->permissions()->pluck('name')->all();
-        $new_permissions = Permission::whereIn('id', $permissions)->pluck('name')->all();
-
-        $this->permissions()->sync($permissions);
-
-        $same_permissions = count($old_permissions) == count($new_permissions) && ! array_diff($old_permissions, $new_permissions);
-
-        if (! $same_permissions) {
-            $user = auth()->user();
-            event(new RolePermissionsUpdated(
-                $old_permissions,
-                $new_permissions,
-                $this,
-                $user
-            ));
+        if (blank($search)) {
+            return $query;
         }
+
+        return $query->where(function (Builder $query) use ($search) {
+            foreach ($this->searchable as $column) {
+                $query->orWhere($column, 'like', "%{$search}%");
+            }
+        });
+    }
+
+    /**
+     * The description, or the name when there's none, translated
+     */
+    public function getTranslatedDescriptionAttribute(): string
+    {
+        return __($this->description ?: $this->name);
+    }
+
+    /**
+     * Replace the role's permissions with the given permission ids of the role's guard,
+     * and dispatch RolePermissionsUpdated if they changed
+     *
+     * @param  array<int, int|string>  $permission_ids
+     */
+    public function syncPermissionIds(array $permission_ids, ?Model $causer = null): void
+    {
+        $permission_class = app(PermissionRegistrar::class)->getPermissionClass();
+
+        $old_permissions = $this->permissions()->pluck('name')->all();
+
+        $new_permission_ids = $permission_class::query()
+            ->where('guard_name', $this->guard_name)
+            ->whereIn('id', $permission_ids)
+            ->pluck('id')
+            ->all();
+
+        $this->permissions()->sync($new_permission_ids);
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $this->unsetRelation('permissions');
+
+        $new_permissions = $this->permissions()->pluck('name')->all();
+
+        if (! array_diff($old_permissions, $new_permissions) && ! array_diff($new_permissions, $old_permissions)) {
+            return;
+        }
+
+        RolePermissionsUpdated::dispatch($old_permissions, $new_permissions, $this, $causer ?? auth()->user());
     }
 }

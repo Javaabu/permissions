@@ -1,5 +1,5 @@
 {
     "name": "Permissions",
-    "description": "Modifications brought upon spatie/laravel-permissions",
-    "version": "2"
+    "description": "Roles, permissions and policies for Laravel apps and packages, built on spatie/laravel-permission",
+    "version": "3"
 }
