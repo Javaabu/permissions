@@ -3,25 +3,18 @@
 namespace Javaabu\Permissions\Tests\Feature;
 
 use Illuminate\Support\Facades\Event;
-use Javaabu\Activitylog\Models\Activity;
 use Javaabu\Permissions\Events\RolePermissionsUpdated;
 use Javaabu\Permissions\Models\Permission;
-use Javaabu\Permissions\Tests\InteractsWithDatabase;
 use Javaabu\Permissions\Models\Role;
+use Javaabu\Permissions\Tests\InteractsWithDatabase;
 use Javaabu\Permissions\Tests\Models\User;
 use Javaabu\Permissions\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Activitylog\Models\Activity;
 
 class RolesTest extends TestCase
 {
     use InteractsWithDatabase;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->runMigrations();
-    }
 
     #[Test]
     public function it_can_sync_the_role_permissions(): void
@@ -32,7 +25,7 @@ class RolesTest extends TestCase
         $role = new Role([
             'name' => 'Test Role',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role->save();
@@ -41,7 +34,7 @@ class RolesTest extends TestCase
             'name' => 'test',
             'description' => 'Test description',
             'guard_name' => 'web',
-            'model' => 'test'
+            'model' => 'test',
         ]);
 
         $permission->save();
@@ -55,7 +48,7 @@ class RolesTest extends TestCase
     }
 
     #[Test]
-    function an_event_is_emitted_when_a_roles_permissions_is_updated()
+    public function an_event_is_emitted_when_a_roles_permissions_is_updated()
     {
         Event::fake();
 
@@ -65,7 +58,7 @@ class RolesTest extends TestCase
         $role = new Role([
             'name' => 'Test Role',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role->save();
@@ -74,7 +67,7 @@ class RolesTest extends TestCase
             'name' => 'test',
             'description' => 'Test description',
             'guard_name' => 'web',
-            'model' => 'test'
+            'model' => 'test',
         ]);
 
         $permission->save();
@@ -94,7 +87,7 @@ class RolesTest extends TestCase
     }
 
     #[Test]
-    function it_logs_the_new_and_old_permissions_when_a_role_is_updated()
+    public function it_logs_the_new_and_old_permissions_when_a_role_is_updated()
     {
         $user = new User(['name' => 'John', 'email' => 'test@example.com']);
         $user->save();
@@ -102,7 +95,7 @@ class RolesTest extends TestCase
         $role = new Role([
             'name' => 'Test Role',
             'description' => 'Test description',
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
         $role->save();
@@ -111,7 +104,7 @@ class RolesTest extends TestCase
             'name' => 'test',
             'description' => 'Test description',
             'guard_name' => 'web',
-            'model' => 'test'
+            'model' => 'test',
         ]);
 
         $permission->save();
@@ -126,8 +119,8 @@ class RolesTest extends TestCase
         ]);
 
         /** @var Activity $log */
-        $log = $role->activities()->latest('id')->first();
-        $changes = $log->changes();
+        $log = Activity::query()->where('subject_type', $role->getMorphClass())->where('subject_id', $role->id)->latest('id')->first();
+        $changes = $this->loggedChanges($log);
 
         $old = $changes->get('old');
         $new = $changes->get('attributes');

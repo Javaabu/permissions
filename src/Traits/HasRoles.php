@@ -2,28 +2,33 @@
 
 namespace Javaabu\Permissions\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Javaabu\Permissions\Events\UserRoleUpdated;
-use Javaabu\Permissions\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Traits\HasRoles as SpatieHasRoles;
 
 trait HasRoles
 {
-    use \Spatie\Permission\Traits\HasRoles;
+    use SpatieHasRoles;
 
     /**
-     * Check if the user has any of the following permissions
+     * Whether the model has any of the permissions
      *
-     * @param  array|string  $permissions
+     * Without a guard, this goes through the gate, so `Gate::before()` callbacks apply.
+     * With a guard, only permissions of that guard count.
+     *
+     * @param  string|array<int, string>  $permissions
      */
-    public function anyPermission($permissions): bool
+    public function anyPermission(string|array $permissions, ?string $guard = null): bool
     {
-        if (! is_array($permissions)) {
-            $permissions = [$permissions];
-        }
+        foreach (Arr::wrap($permissions) as $permission) {
+            $allowed = $guard === null
+                ? $this->can($permission)
+                : $this->checkPermissionTo($permission, $guard);
 
-        foreach ($permissions as $permission) {
-            if ($this->can($permission)) {
+            if ($allowed) {
                 return true;
             }
         }
@@ -32,80 +37,88 @@ trait HasRoles
     }
 
     /**
-     * Update the role
+     * Change the model's roles, if the causer may, and dispatch UserRoleUpdated
      *
-     * @param $role
-     * @param bool $new whether creating user for the first time
+     * The causer may when it passes the `updateRole` ability for this model class.
+     * When it doesn't and `$new` is true, the model gets the default role instead
+     * (`$default_role`, or `config('permissions.default_role')`). Roles that don't
+     * exist for the model's guard are ignored; if none of the given roles exist,
+     * nothing changes. A causer that may update roles can pass `[]` to remove them all.
+     *
+     * @param  string|array<int, string>  $role
+     * @param  bool  $new  whether the model is being created
+     * @param  Model|null  $causer  defaults to the signed-in user
      */
-    public function updateRole($role, bool $new = false)
+    public function updateRole(string|array $role, bool $new = false, ?Model $causer = null, ?string $default_role = null): void
     {
-        $user = auth()->user();
-        if (! $user instanceof Model) {
+        $causer ??= auth()->user();
+
+        if (! $causer instanceof Model) {
             return;
         }
 
-        $role = Arr::wrap($role);
+        $can_update_role = $causer->can('updateRole', static::class);
 
-        // update role only if it's a new user or the user can update the role
-        if ($user->can('updateRole', self::class) || $new) {
-            $old_role = $this->roles()->pluck('name')->all();
-            $new_role = $user->can('updateRole', self::class) ? $role : [get_setting('default_role')];
+        if (! $can_update_role && ! $new) {
+            return;
+        }
 
-            // remove fake roles
-            if ($new_role) {
-                $correct_role_names = Role::whereIn('name', $new_role)->pluck('name')->all();
-                $correct_roles = array_intersect($new_role, $correct_role_names);
+        $new_role = $can_update_role
+            ? Arr::wrap($role)
+            : array_filter([$default_role ?? config('permissions.default_role')]);
 
-                // no correct rules
-                if (! $correct_roles) {
-                    return;
-                }
+        if ($new_role) {
+            $role_class = app(PermissionRegistrar::class)->getRoleClass();
 
-                $new_role = $correct_roles;
-            }
+            $existing_roles = $role_class::query()
+                ->where('guard_name', $this->getDefaultGuardName())
+                ->whereIn('name', $new_role)
+                ->pluck('name')
+                ->all();
 
-            $this->syncRoles($new_role);
+            $new_role = array_values(array_intersect($new_role, $existing_roles));
 
-            $same_roles = count($old_role) == count($new_role) && ! array_diff($old_role, $new_role);
-
-            // log the role update
-            if (! $same_roles) {
-                event(new UserRoleUpdated($old_role, $new_role, $this, $user));
+            if (! $new_role) {
+                return;
             }
         }
+
+        if (! $new_role && ! $can_update_role) {
+            return;
+        }
+
+        $old_role = $this->roles()->pluck('name')->all();
+
+        $this->syncRoles($new_role);
+
+        if (! array_diff($old_role, $new_role) && ! array_diff($new_role, $old_role)) {
+            return;
+        }
+
+        UserRoleUpdated::dispatch($old_role, $new_role, $this, $causer);
     }
 
     /**
-     * Get all users with a specific permission
-     *
-     * @param $query
-     * @param $permissions array|string
-     * @return mixed
+     * The model's first role
      */
-    public function scopePermission($query, $permissions): mixed
-    {
-        if (! is_array($permissions)) {
-            $permissions = [$permissions];
-        }
-
-        $query->whereHas('roles', function ($query) use ($permissions) {
-            foreach ($permissions as $permission) {
-                $query->whereHas('permissions', function ($query) use ($permission) {
-                    $query->whereName($permission);
-                });
-            }
-        });
-
-        return $query;
-    }
-
-    /**
-     * Get role attribute
-     *
-     * @return Role|null
-     */
-    public function getRoleAttribute(): ?Role
+    public function getRoleAttribute(): ?Model
     {
         return $this->roles->first();
+    }
+
+    /**
+     * Models that have the permission through any of their roles, on any guard
+     *
+     * Unlike spatie's `permission()` scope, this ignores direct permissions.
+     *
+     * @param  string|array<int, string>  $permissions  all are required
+     */
+    public function scopeWhereRoleHasPermissions(Builder $query, string|array $permissions): Builder
+    {
+        return $query->whereHas('roles', function (Builder $query) use ($permissions) {
+            foreach (Arr::wrap($permissions) as $permission) {
+                $query->whereHas('permissions', fn (Builder $query) => $query->where('name', $permission));
+            }
+        });
     }
 }
