@@ -4,6 +4,8 @@ namespace Javaabu\Permissions\Tests\Feature;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Javaabu\Manifest\Enums\NpmScopes;
+use Javaabu\Manifest\Manifest;
 use Javaabu\Permissions\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -54,19 +56,33 @@ class ManifestCheckTest extends TestCase
         return collect(json_decode(Artisan::output(), true))->keyBy('name')->all();
     }
 
+    /**
+     * The rows permissions is one of the packages asking for
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    protected function rowsNeededByPermissions(): array
+    {
+        return collect($this->check())
+            ->filter(fn (array $row) => in_array('permissions', $row['needed_by'], true))
+            ->all();
+    }
+
     #[Test]
-    public function a_blade_app_passes_without_installing_react(): void
+    public function a_blade_app_is_not_asked_for_react_by_permissions(): void
     {
         $this->app($this->blade_app);
 
-        $this->artisan('manifest:check')
-            ->expectsOutputToContain('Everything the packages need is installed.')
-            ->assertSuccessful();
-
-        $rows = $this->check();
+        // javaabu/forms' Blade assets are checked too and need react for its Thaana keyboard
+        // (Javaabu/onu#62); only what permissions asks for is under test here
+        $rows = $this->rowsNeededByPermissions();
 
         foreach (['react', 'react-dom', '@inertiajs/react', '@javaabu/forms'] as $name) {
             $this->assertArrayNotHasKey($name, $rows);
+        }
+
+        foreach ($rows as $name => $row) {
+            $this->assertEquals('ok', $row['status'], $name);
         }
     }
 
@@ -79,8 +95,19 @@ class ManifestCheckTest extends TestCase
 
         foreach (['@javaabu/forms', 'react', 'react-dom'] as $name) {
             $this->assertEquals('missing', $rows[$name]['status'], $name);
-            $this->assertEquals(['pages'], $rows[$name]['scopes'], $name);
+            $this->assertContains('pages', $rows[$name]['scopes'], $name);
             $this->assertContains('permissions', $rows[$name]['needed_by'], $name);
+        }
+
+        // rows merge every package's scopes (javaabu/forms asks for react in assets), so check
+        // permissions' own declaration: the React packages are for the pages only
+        $package = app(Manifest::class)->package('permissions');
+        $for_assets = [...$package->npmDependencies(NpmScopes::ASSETS), ...$package->npmPeerDependencies(NpmScopes::ASSETS)];
+        $for_pages = [...$package->npmDependencies(NpmScopes::PAGES), ...$package->npmPeerDependencies(NpmScopes::PAGES)];
+
+        foreach (['@javaabu/forms', 'react', 'react-dom', '@inertiajs/react'] as $name) {
+            $this->assertArrayNotHasKey($name, $for_assets, $name);
+            $this->assertArrayHasKey($name, $for_pages, $name);
         }
 
         $this->assertEquals(['^2.0 || ^3.0'], $rows['@inertiajs/react']['constraints']);
