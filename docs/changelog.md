@@ -3,4 +3,4 @@ title: Changelog
 sidebar_position: 1.5
 ---
 
-All notable changes to this package are documented on [GitHub](https://github.com/Javaabu/permissions/blob/main/CHANGELOG.md)
+All notable changes to this package are documented on [GitHub](https://github.com/Javaabu/permissions/blob/main/CHANGELOG.md). Moving from v2? Read [Upgrading](upgrading.md).
